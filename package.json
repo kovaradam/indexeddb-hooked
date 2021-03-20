@@ -1,7 +1,7 @@
 {
   "name": "indexeddb-hooked",
   "version": "0.1.0",
-  "description": "React adapter for IndexedDB",
+  "description": "IndexedDB adapter for React",
   "main": "dist/index.js",
   "scripts": {
     "prepack": "tsc",
