@@ -3,7 +3,7 @@ import Store from './store';
 import { createPromiseWithOutsideResolvers } from './utils';
 
 export const openDB = (config: Config): Promise<IDBDatabase> => {
-  const name = config.name || 'ReactiveDB';
+  const name = config.name || 'indexeddb-hooked';
   const version = config.version || 1;
   const DBOpenRequest = window.indexedDB.open(name, version);
 
@@ -42,7 +42,7 @@ export const openDB = (config: Config): Promise<IDBDatabase> => {
     ((_: IDBVersionChangeEvent): void => {
       if (config.objectStores.some(({ name }) => !name)) {
         promiseReject(
-          'Warning: Object store parameters were not provided on version change',
+          'Error: Object store parameters were not provided on version change',
         );
         return;
       }

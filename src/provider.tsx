@@ -9,7 +9,6 @@ export type Context = {
   db: IDBDatabase | null;
   triggerUpdate: (storeName: string) => void;
   transactionCountStore: Record<string, number>;
-  keepLastReadResults?: boolean;
 };
 
 export const DBContext = React.createContext<Context | null>(null);
@@ -35,7 +34,6 @@ const IndexedDBProvider: React.FC<Props> = ({ config, children }) => {
       db,
       triggerUpdate,
       transactionCountStore,
-      keepLastReadResults: config.keepLastReadResults,
     }),
     [triggerUpdate, db, transactionCountStore, config],
   );

@@ -70,7 +70,7 @@ function put(data: UpdateData, objectStore: IDBObjectStore): void {
   const request = objectStore.get(key);
   request.onsuccess = (_: Event): void => {
     let DBObject = request.result;
-    if (typeof value === 'object') {
+    if (DBObject !== undefined && typeof DBObject === 'object') {
       Object.assign(DBObject, value);
     } else {
       DBObject = value;
