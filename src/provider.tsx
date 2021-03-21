@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { openDB, Config } from './open';
+import { Config } from './model';
+import { openDB } from './open';
 import Store from './store';
 
 type Props = { config: Config };

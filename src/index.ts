@@ -7,3 +7,5 @@ import useUpdate from './hooks/use-update';
 import IndexedDBProvider from './provider';
 
 export { read, update, useRead, useUpdate, IndexedDBProvider };
+
+export * from './model';
