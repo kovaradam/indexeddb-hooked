@@ -7,13 +7,15 @@ type UseUpdateReturnType = (storeName: string, data: UpdateData) => void;
 function useUpdate(): UseUpdateReturnType {
   const { db, triggerUpdate } = useDB();
 
-  function update(storeName: string, data: UpdateData): void {
+  function update(storeName: string, data: UpdateData, renderOnUpdate = true): void {
     const onError = (event: Event): void => {
       console.log(event.type);
     };
 
     const onComplete = (_: Event): void => {
-      triggerUpdate(storeName);
+      if (renderOnUpdate) {
+        triggerUpdate(storeName);
+      }
     };
 
     asyncUpdate(storeName, { data, db, onComplete, onError });

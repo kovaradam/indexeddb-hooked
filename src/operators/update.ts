@@ -39,11 +39,11 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
 export default function update<T>(
   storeName: string,
   data: UpdateData | UpdateData[],
-  triggerUpdate = true,
+  renderOnUpdate = true,
 ): Promise<T> {
   const [promise, resolve, reject] = createPromiseWithOutsideResolvers<T, string>();
   function onComplete(): void {
-    if (triggerUpdate !== false) {
+    if (renderOnUpdate !== false) {
       Store.triggerUpdate(storeName);
     }
     resolve((null as unknown) as T);

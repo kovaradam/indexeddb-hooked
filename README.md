@@ -102,6 +102,8 @@ const AddFruit = () => {
 };
 ```
 
+Update triggers re-render on components that read from the updated object store only. You can prevent this rendering by setting the third optional argument of the `update` function to `false`.
+
 #### Update parameters
 
 Behaviour of the update function depends on the [definition of your object stores](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database).
@@ -112,3 +114,9 @@ To specify update operation, you must provide a second argument in a form of an 
 | `value` | your input data | `object`, `number`, `string`, `null` |
 | `key?` | key of the modified data entry | [IDBValidKey](https://microsoft.github.io/PowerBI-JavaScript/modules/_node_modules_typedoc_node_modules_typescript_lib_lib_dom_d_.html#idbvalidkey) |
 | `replace?` | If true, then input data overrides (not merges with) the old data entry | `boolean` |
+
+#### Deleting data
+
+Delete your data by specifying `key` and setting the `value` update parameter to `null`.
+
+todo..
