@@ -82,7 +82,7 @@ function upgradeStores(
       // Store values in the newly created objectStore.
       const dataObjectStore = db.transaction(name, 'readwrite').objectStore(name);
       data.forEach((item) => {
-        if (dataObjectStore.keyPath) {
+        if (dataObjectStore.keyPath || dataObjectStore.autoIncrement) {
           dataObjectStore.add(item);
         } else {
           if (!dataKey) {

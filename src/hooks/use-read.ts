@@ -28,6 +28,8 @@ function useRead<T extends DBRecord | DBRecord[]>(
     createReadResult(null, transactionCount),
   );
 
+  if (!db) return null;
+
   if (lastResult.value && transactionCount === lastResult.transactionCount) {
     return lastResult.value;
   }

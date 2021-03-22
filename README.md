@@ -18,6 +18,7 @@ const config = {
   objectStores: [
     {
       name: 'fruits',
+      options: { autoIncrement: true },
       data: ['apple', 'banana', 'kiwi'],
     },
     {
@@ -48,7 +49,7 @@ Once the IDB is open, you access your data via `useRead` hook:
 import React from 'react';
 import { useRead } from 'indexeddb-hooked';
 
-const Juicy = () => {
+const FruitsBasket = () => {
   const fruits = useRead('fruits');
 
   if (!fruits) return <div>Loading</div>;
@@ -85,7 +86,7 @@ import React from 'react';
 import { useUpdate } from 'indexeddb-hooked';
 
 const AddFruit = () => {
-  const { update } = useUpdate();
+  const update = useUpdate();
   const inputEl = useRef(null);
 
   const onSubmit = (e) => {
@@ -111,7 +112,7 @@ Behaviour of the update function depends on the [definition of your object store
 To specify update operation, you must provide a second argument in a form of an object.
 |Value||Type|
 | - | - | -: |
-| `value` | your input data | `object`, `number`, `string`, `null` |
+| `value` | your input data | `object`, `number`, `string`, `null`, `array` |
 | `key?` | key of the modified data entry | [IDBValidKey](https://microsoft.github.io/PowerBI-JavaScript/modules/_node_modules_typedoc_node_modules_typescript_lib_lib_dom_d_.html#idbvalidkey) |
 | `replace?` | If true, then input data overrides (not merges with) the old data entry | `boolean` |
 
