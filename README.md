@@ -76,6 +76,9 @@ To specify request, you must provide a second argument in a form of an object. I
 | `key?` | Returns first data entry with given key | [IDBValidKey](https://microsoft.github.io/PowerBI-JavaScript/modules/_node_modules_typedoc_node_modules_typescript_lib_lib_dom_d_.html#idbvalidkey) |
 | `keyRange?` | Returns entries within given key range | [IDBKeyRange](https://developer.mozilla.org/en-US/docs/Web/API/IDBKeyRange) |
 | `direction?` | Specify direction of read result | `next`, `nextunique`, `prev`, `prevunique` |
+| `index?` | Specify index to search by other value than the primary key | `string` |
+| `filter?` | Filter function | `(value) => boolean` |
+| `returnWithKey?` | Data is returned with its key in form of `{ value, key }` object | `boolean` |
 
 ### Update your data
 

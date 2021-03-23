@@ -9,7 +9,7 @@ function useUpdate(): UseUpdateReturnType {
 
   function update(storeName: string, data: UpdateData, renderOnUpdate = true): void {
     const onError = (event: Event): void => {
-      console.log(event.type);
+      throw new Error(event.type);
     };
 
     const onComplete = (_: Event): void => {

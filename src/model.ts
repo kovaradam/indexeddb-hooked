@@ -6,10 +6,13 @@ export type UpdateData = {
   replace?: boolean;
 };
 
-export interface BaseReadParams {
+export interface ReadParams<T = any> {
   key?: IDBValidKey;
   keyRange?: IDBKeyRange;
   direction?: IDBCursorDirection;
+  index?: string;
+  filter?: (value: T) => boolean;
+  returnWithKey?: boolean;
 }
 
 interface IndexParams {

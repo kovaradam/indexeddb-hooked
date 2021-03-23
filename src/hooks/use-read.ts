@@ -1,26 +1,36 @@
-import { useState } from 'react';
-import { BaseReadParams, DBRecord } from '../model';
+import { useRef, useState } from 'react';
+import { ReadParams as BaseReadParams, DBRecord } from '../model';
 import { asyncRead } from '../operators/read';
 import { compareStringifiedObjects } from '../utils';
 import useDB from './use-db';
 
-interface UseReadParams extends BaseReadParams {}
-
 type ReadResult<T> = { value: T | null; transactionCount: number };
+
+interface UseReadParams<T> extends BaseReadParams<T> {}
 
 function useRead<T extends DBRecord | DBRecord[]>(
   storeName: string,
-  params: UseReadParams,
+  params: UseReadParams<T> & { key: IDBValidKey; returnWithKey: true },
+): { value: T; key: IDBValidKey } | null;
+
+function useRead<T extends DBRecord | DBRecord[]>(
+  storeName: string,
+  params: UseReadParams<T> & { key: IDBValidKey },
 ): T | null;
 
 function useRead<T extends DBRecord | DBRecord[]>(
   storeName: string,
-  params?: UseReadParams,
+  params: UseReadParams<T> & { returnWithKey: true },
+): { value: T; key: IDBValidKey }[] | null;
+
+function useRead<T extends DBRecord | DBRecord[]>(
+  storeName: string,
+  params?: UseReadParams<T>,
 ): T[] | null;
 
 function useRead<T extends DBRecord | DBRecord[]>(
   storeName: string,
-  params?: UseReadParams,
+  params?: UseReadParams<T>,
 ): T | null {
   const { db, transactionCountStore } = useDB();
   const transactionCount = transactionCountStore[storeName];
@@ -28,9 +38,20 @@ function useRead<T extends DBRecord | DBRecord[]>(
     createReadResult(null, transactionCount),
   );
 
+  const persistedParams = useRef(params);
+  const isParamChange = useRef(params).current !== params;
+
+  if (isParamChange) {
+    persistedParams.current = params;
+  }
+
   if (!db) return null;
 
-  if (lastResult.value && transactionCount === lastResult.transactionCount) {
+  if (
+    !isParamChange &&
+    lastResult.value &&
+    transactionCount === lastResult.transactionCount
+  ) {
     return lastResult.value;
   }
 
@@ -51,7 +72,7 @@ function useRead<T extends DBRecord | DBRecord[]>(
   }
 
   function onError(event: Event): void {
-    console.log(event.type);
+    throw new Error(event.type);
   }
 
   asyncRead<T>(storeName, { ...params, db, onSuccess, onError });
