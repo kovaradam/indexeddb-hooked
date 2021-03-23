@@ -1,7 +1,9 @@
-import { useRead } from 'indexeddb-hooked';
+import { ReadParams, useRead } from 'indexeddb-hooked';
 
-const Juicy: React.FC = () => {
-  const fruits = useRead<string[]>('fruits');
+type Props = { params?: ReadParams<string>; storeName?: string };
+
+const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
+  const fruits = useRead<string>(storeName || 'fruits', params);
 
   if (!fruits) return <div>Loading</div>;
   /* Since IDB operations are asynchronous, useRead returns `null`
@@ -16,4 +18,4 @@ const Juicy: React.FC = () => {
   );
 };
 
-export default Juicy;
+export default FruitsBasket;
