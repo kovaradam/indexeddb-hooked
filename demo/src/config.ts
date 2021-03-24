@@ -12,7 +12,9 @@ const config: Config = {
     {
       name: 'fruit-lists',
       options: { keyPath: 'id', autoIncrement: true },
-      indexes: [{ name: 'name', keyPath: 'name', options: { unique: true } }],
+      indexes: [
+        { name: 'by_name', keyPath: 'name', options: { unique: true, locale: 'auto' } },
+      ],
     },
   ],
   onOpenSuccess: () => console.log('DB is open and delicious'),

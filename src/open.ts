@@ -37,9 +37,13 @@ export const openDB = (config: Config): Promise<IDBDatabase> => {
     }
   };
 
-  DBOpenRequest.onupgradeneeded =
-    config.onUpgradeNeeded ||
-    ((_: IDBVersionChangeEvent): void => {
+  let onUpgradeNeeded: (event: IDBVersionChangeEvent) => void;
+
+  if (config.onUpgradeNeeded) {
+    onUpgradeNeeded = (event: IDBVersionChangeEvent) =>
+      config.onUpgradeNeeded(event, config.objectStores);
+  } else {
+    onUpgradeNeeded = (_: IDBVersionChangeEvent): void => {
       if (config.objectStores.some(({ name }) => !name)) {
         promiseReject(
           'Error: Object store parameters were not provided on version change',
@@ -47,8 +51,9 @@ export const openDB = (config: Config): Promise<IDBDatabase> => {
         return;
       }
       upgradeStores(config.objectStores, DBOpenRequest);
-    });
-
+    };
+  }
+  DBOpenRequest.onupgradeneeded = onUpgradeNeeded;
   return promise;
 };
 

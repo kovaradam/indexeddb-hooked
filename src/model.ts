@@ -1,4 +1,20 @@
-export type DBRecord = Record<string, unknown> | string | number;
+export type DBRecord =
+  | Record<string, unknown>
+  | string
+  | number
+  | boolean
+  | Date
+  | RegExp
+  | undefined
+  | Blob
+  | File
+  | Record<string, unknown>[]
+  | string[]
+  | number[]
+  | boolean[]
+  | Date[]
+  | RegExp[]
+  | undefined[];
 
 export type UpdateData = {
   value: DBRecord | null;
@@ -33,8 +49,9 @@ export type Config = {
   name?: string;
   version?: number;
   objectStores: ObjectStoreParams[];
-  keepLastReadResults?: boolean;
   onOpenSuccess?: ((db: Event) => void) | (() => void);
   onOpenError?: ((event: Event) => void) | (() => void);
-  onUpgradeNeeded?: ((event: IDBVersionChangeEvent) => void) | (() => void);
+  onUpgradeNeeded?:
+    | ((event: IDBVersionChangeEvent, objectStores: ObjectStoreParams[]) => void)
+    | (() => void);
 };
