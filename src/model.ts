@@ -55,3 +55,5 @@ export type Config = {
     | ((event: IDBVersionChangeEvent, objectStores: ObjectStoreParams[]) => void)
     | (() => void);
 };
+
+export type ResultWithKey<T> = { value: T; key: IDBValidKey };

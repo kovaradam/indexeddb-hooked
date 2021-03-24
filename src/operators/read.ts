@@ -1,10 +1,12 @@
-import { ReadParams as BaseReadParams } from '../model';
+import { ReadParams as BaseReadParams, ResultWithKey } from '../model';
 import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
+type Result<T> = T | ResultWithKey<T> | null;
+
 interface AsyncReadParams<T> extends BaseReadParams<T> {
   db: IDBDatabase | null;
-  onSuccess: (result: T, event: Event) => void;
+  onSuccess: (result: Result<T> | Result<T>[], event: Event) => void;
   onError?: (event: Event) => void;
 }
 
@@ -12,6 +14,7 @@ const defaultDirection = 'next';
 
 export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): void {
   const { db, onSuccess } = params;
+
   if (!db) {
     throw new Error('Error: database is not open');
   }
@@ -22,17 +25,17 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
   if (!params) {
     const request = objectStore.getAll();
     request.onsuccess = (event: Event): void => {
-      onSuccess((request.result as unknown) as T, event);
+      onSuccess(request.result, event);
     };
   } else if (params?.key) {
     const request = params.index
       ? objectStore.index(params.index).get(params.key)
       : objectStore.get(params.key);
     request.onsuccess = (event: Event): void => {
-      onSuccess(request.result, event);
+      onSuccess(createResult(request.result, params.key), event);
     };
   } else {
-    const result: T[] = [];
+    const result: Result<T>[] = [];
     const keyRange = params.keyRange || null;
     const direction = params.direction || defaultDirection;
     const request = objectStore.openCursor(keyRange, direction);
@@ -42,14 +45,11 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
         if (params.filter && !params.filter(cursor.value)) {
           cursor.continue();
         } else {
-          const value = params.returnWithKey
-            ? { value: cursor.value, key: cursor.key }
-            : cursor.value;
-          result.push(value);
+          result.push(createResult(cursor.value, cursor.key));
           cursor.continue();
         }
       } else {
-        onSuccess((result as unknown) as T, event);
+        onSuccess(result, event);
       }
     };
   }
@@ -57,6 +57,16 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
   transaction.onerror = (event: Event): void => {
     params.onError && params.onError(event);
   };
+
+  function createResult<T>(value: T, key: IDBValidKey): Result<T> {
+    if (!value) {
+      return null;
+    }
+    if (params.returnWithKey) {
+      return { value, key };
+    }
+    return value;
+  }
 }
 
 interface ReadParams<T> extends BaseReadParams<T> {
@@ -76,8 +86,4 @@ export default function read<T>(storeName: string, params?: ReadParams<T>): Prom
 
   asyncRead(storeName, { ...params, db: Store.getDB(), onSuccess, onError });
   return promise;
-}
-
-function returnWithKey<T>(value: T, key: IDBValidKey): { value: T; key: IDBValidKey } {
-  return { value, key };
 }
