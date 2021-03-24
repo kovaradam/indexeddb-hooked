@@ -41,6 +41,20 @@ const App = () => {
 export default App;
 ```
 
+<details open>
+<summary>Config parameters</summary>
+ 
+|Value| |Type|
+| - | - | -: |
+| `name?` | Name of your database | `string` |
+| `version?` | Current [version](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#opening_a_database) of your database | `unsigned long long` |
+| `objectStores` | Definition of your object stores | [ObjectStoreParams[]](#objectstoreparams) |
+| `onOpenSuccess?` | Callback function called if the [IDBFactory.open](https://developer.mozilla.org/en-US/docs/Web/API/IDBFactory/open) request was successful | [IDBRequest.onsuccess](https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest/onsuccess) |
+| `onOpenError?` | Callback function fired when the open request returns an error. | [IDBRequest.onerror](https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest/onerror) |
+| `onUpgradeNeeded?` | Callback function fired when the database doesn't already exist or if version number is upgraded. Specify this event handler in case you want full control over the creation of your database schema. |`(event, objectStores) => void` |
+
+</details>
+
 ### Request your data
 
 Once the IDB is open, you access your data via `useRead` hook:
@@ -119,8 +133,39 @@ To specify update operation, you must provide a second argument in a form of an 
 | `key?` | key of the modified data entry | [IDBValidKey](https://microsoft.github.io/PowerBI-JavaScript/modules/_node_modules_typedoc_node_modules_typescript_lib_lib_dom_d_.html#idbvalidkey) |
 | `replace?` | If true, then input data overrides (not merges with) the old data entry | `boolean` |
 
-#### Deleting data
+### Deleting data
 
 Delete your data by specifying `key` and setting the `value` update parameter to `null`.
 
-todo..
+### Other types
+
+#### ObjectStoreParams
+  
+|Value||Type|
+|-|-|-:|
+| `name` | Name of the object store | `string` |
+| `options?` | Specify [supply](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database) of your value keys by a [key path](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_keypath) or a [key generator](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_keygenerator) | [IDBObjectStoreParameters](#idbobjectstoreparameters) |
+| `indexes?` | Array containing parameters of indices to create on the database | [IndexParams[]](#indexparams) |
+| `data?` | Input data entries | `boolean`, `number`, `string`, `date`, `object`, `array`, `regexp`, `undefined`, `Blob`,`File`, `null`.` |
+| `dataKey?` | If `data` is provided and the store uses [out-of-line](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_outofline_key) keys, you must provide a name of the attribute, that will be used as a key when the data is inserted into the database | `string` |
+
+#### IDBObjectStoreParameters
+ 
+|Value||Type|
+| - | - | -: |
+| `keyPath?` | Defines where the browser should extract the key from in the object store or index. If empty or not specified, the object store is created without a key path and uses [out-of-line](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_outofline_key) keys. | `string`, `string[]` |
+| `autoIncrement?` | If `true`, the object store has a [key generator](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_keygenerator). Defaults to `false`. | `boolean` |
+
+#### IndexParams
+|Value||Type|
+| - | - | -: |
+| `name` | Name of the index | `string` |
+| `keyPath?` | The key path for the index to use | `string`, `string[]` |
+| `options?` | An object with other index attributes | [IDBIndexParameters](#idbindexparameters) |
+
+#### IDBIndexParameters 
+|Value||Type|
+| - | - | -: |
+| `unique?` | If true, the index will not allow duplicate values for a single key. | `boolean` |
+| `multiEntry?` | If `true`, the index will add an entry in the index for each array element when the `keyPath` resolves to an Array. If `false`, it will add one single entry containing the Array. | `boolean` |
+
