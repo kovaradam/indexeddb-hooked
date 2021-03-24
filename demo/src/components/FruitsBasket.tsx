@@ -11,9 +11,11 @@ const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
 
   return (
     <ul>
-      {fruits.map((fruit) => (
-        <li>{fruit}</li>
-      ))}
+      {fruits.length ? (
+        fruits.map((fruit) => <li>{JSON.stringify(fruit)}</li>)
+      ) : (
+        <li>{JSON.stringify(fruits)}</li>
+      )}
     </ul>
   );
 };
