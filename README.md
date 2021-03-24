@@ -41,7 +41,7 @@ const App = () => {
 export default App;
 ```
 
-<details open>
+<details>
 <summary>Config parameters</summary>
  
 |Value| |Type|
@@ -129,8 +129,8 @@ Behaviour of the update function depends on the [definition of your object store
 To specify update operation, you must provide a second argument in a form of an object.
 |Value||Type|
 | - | - | -: |
-| `value` | your input data | `object`, `number`, `string`, `null`, `array` |
-| `key?` | key of the modified data entry | [IDBValidKey](https://microsoft.github.io/PowerBI-JavaScript/modules/_node_modules_typedoc_node_modules_typescript_lib_lib_dom_d_.html#idbvalidkey) |
+| `value` | Your input data | `boolean`, `number`, `string`, `date`, `object`, `array`, `regexp`, `undefined`, `Blob`,`File`, `null` |
+| `key?` | Key of the modified data entry | [IDBValidKey](https://microsoft.github.io/PowerBI-JavaScript/modules/_node_modules_typedoc_node_modules_typescript_lib_lib_dom_d_.html#idbvalidkey) |
 | `replace?` | If true, then input data overrides (not merges with) the old data entry | `boolean` |
 
 ### Deleting data
@@ -146,7 +146,7 @@ Delete your data by specifying `key` and setting the `value` update parameter to
 | `name` | Name of the object store | `string` |
 | `options?` | Specify [supply](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database) of your value keys by a [key path](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_keypath) or a [key generator](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_keygenerator) | [IDBObjectStoreParameters](#idbobjectstoreparameters) |
 | `indexes?` | Array containing parameters of indices to create on the database | [IndexParams[]](#indexparams) |
-| `data?` | Input data entries | `boolean`, `number`, `string`, `date`, `object`, `array`, `regexp`, `undefined`, `Blob`,`File`, `null`.` |
+| `data?` | Input data entries | `boolean[]`, `number[]`, `string[]`, `date[]`, `object[]`, `array[]`, `regexp[]`, `undefined[]`, `Blob[]`,`File[]` |
 | `dataKey?` | If `data` is provided and the store uses [out-of-line](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_outofline_key) keys, you must provide a name of the attribute, that will be used as a key when the data is inserted into the database | `string` |
 
 #### IDBObjectStoreParameters
