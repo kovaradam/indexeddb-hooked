@@ -1,10 +1,8 @@
 import useDB from './use-db';
 import { asyncUpdate } from '../operators/update';
-import { UpdateData } from '../model';
+import { UpdateData, Updater } from '../model';
 
-type UseUpdateReturnType = (storeName: string, data: UpdateData) => void;
-
-function useUpdate(): UseUpdateReturnType {
+function useUpdate(): Updater<void> {
   const { db, triggerUpdate } = useDB();
 
   function update(storeName: string, data: UpdateData, renderOnUpdate = true): void {

@@ -1,4 +1,4 @@
-import { UpdateData } from '../model';
+import { DBRecord, UpdateData, Updater } from '../model';
 import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
@@ -36,24 +36,26 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
   }
 }
 
-export default function update<T>(
+const update: Updater<Promise<null>> = (
   storeName: string,
-  data: UpdateData | UpdateData[],
+  data: UpdateData,
   renderOnUpdate = true,
-): Promise<T> {
-  const [promise, resolve, reject] = createPromiseWithOutsideResolvers<T, string>();
+) => {
+  const [promise, resolve, reject] = createPromiseWithOutsideResolvers<null, string>();
   function onComplete(): void {
     if (renderOnUpdate !== false) {
       Store.triggerUpdate(storeName);
     }
-    resolve((null as unknown) as T);
+    resolve(null);
   }
   function onError(event: Event): void {
     reject(event.type);
   }
   asyncUpdate(storeName, { data, db: Store.getDB(), onComplete, onError });
   return promise;
-}
+};
+
+export default update;
 
 function put(data: UpdateData, objectStore: IDBObjectStore): void {
   const { value, key, replace } = data;

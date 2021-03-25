@@ -39,9 +39,9 @@ export const openDB = (config: Config): Promise<IDBDatabase> => {
 
   let onUpgradeNeeded: (event: IDBVersionChangeEvent) => void;
 
-  if (config.onUpgradeNeeded) {
+  if (config.onUpgradeNeeded !== undefined) {
     onUpgradeNeeded = (event: IDBVersionChangeEvent) =>
-      config.onUpgradeNeeded(event, config.objectStores);
+      config.onUpgradeNeeded!(event, config.objectStores);
   } else {
     onUpgradeNeeded = (_: IDBVersionChangeEvent): void => {
       if (config.objectStores.some(({ name }) => !name)) {

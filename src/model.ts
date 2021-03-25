@@ -57,3 +57,11 @@ export type Config = {
 };
 
 export type ResultWithKey<T> = { value: T; key: IDBValidKey };
+
+export type ReadResult<T> = T | ResultWithKey<T> | T[] | ResultWithKey<T>[] | null;
+
+export type Updater<T> = (
+  storeName: string,
+  data: UpdateData,
+  renderOnUpdate?: boolean,
+) => T;
