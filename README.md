@@ -92,7 +92,7 @@ To specify request, you must provide a second argument in a form of an object. I
 | `direction?` | Specify direction of read result | `next`, `nextunique`, `prev`, `prevunique` |
 | `index?` | Specify index to search by other value than the primary key | `string` |
 | `filter?` | Filter function | `(value) => boolean` |
-| `returnWithKey?` | Data is returned with its key in form of `{ value, key }` object | `boolean` |
+| `returnWithKey?` | Data is returned with its key in a form of `{ value, key }` object | `boolean` |
 
 ### Update your data
 
