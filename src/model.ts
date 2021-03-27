@@ -62,6 +62,6 @@ export type ReadResult<T> = T | ResultWithKey<T> | T[] | ResultWithKey<T>[] | nu
 
 export type Updater<T> = (
   storeName: string,
-  data: UpdateData,
+  data: UpdateData | UpdateData[],
   renderOnUpdate?: boolean,
 ) => T;

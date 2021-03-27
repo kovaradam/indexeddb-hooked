@@ -1,4 +1,4 @@
-import { DBRecord, UpdateData, Updater } from '../model';
+import { UpdateData, Updater } from '../model';
 import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
@@ -38,7 +38,7 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
 
 const update: Updater<Promise<null>> = (
   storeName: string,
-  data: UpdateData,
+  data: UpdateData | UpdateData[],
   renderOnUpdate = true,
 ) => {
   const [promise, resolve, reject] = createPromiseWithOutsideResolvers<null, string>();

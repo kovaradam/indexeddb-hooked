@@ -5,7 +5,11 @@ import { UpdateData, Updater } from '../model';
 function useUpdate(): Updater<void> {
   const { db, triggerUpdate } = useDB();
 
-  function update(storeName: string, data: UpdateData, renderOnUpdate = true): void {
+  function update(
+    storeName: string,
+    data: UpdateData | UpdateData[],
+    renderOnUpdate = true,
+  ): void {
     const onError = (event: Event): void => {
       throw new Error(event.type);
     };
