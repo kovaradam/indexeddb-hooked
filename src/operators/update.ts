@@ -1,6 +1,6 @@
 import { UpdateData, Updater } from '../model';
 import Store from '../store';
-import { createPromiseWithOutsideResolvers, usesInlineKeys } from '../utils';
+import { createPromiseWithOutsideResolvers } from '../utils';
 
 type AsyncUpdateParams = {
   data: UpdateData | UpdateData[];
@@ -65,7 +65,7 @@ function put(data: UpdateData, objectStore: IDBObjectStore): void {
     return;
   }
   if (replace) {
-    if (usesInlineKeys(objectStore)) {
+    if (objectStore.keyPath !== null) {
       if (!value![objectStore.keyPath as string]) {
         value![objectStore.keyPath as string] = key;
       }
@@ -84,7 +84,7 @@ function put(data: UpdateData, objectStore: IDBObjectStore): void {
     } else {
       DBObject = value;
     }
-    if (!usesInlineKeys(objectStore)) {
+    if (!objectStore.keyPath) {
       objectStore.put(DBObject, key as IDBValidKey);
     } else {
       objectStore.put(DBObject);
