@@ -1,6 +1,6 @@
 {
   "name": "indexeddb-hooked",
-  "version": "0.1.6-fix",
+  "version": "0.1.7",
   "description": "IndexedDB adapter for React",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
