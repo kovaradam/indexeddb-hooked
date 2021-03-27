@@ -47,7 +47,7 @@ function useRead<T extends DBRecord>(
   );
 
   const persistedParams = useRef(params);
-  const isParamChange = !compareStringifiedObjects(persistedParams.current, params);
+  const isParamChange = !compareParams(persistedParams.current, params);
 
   if (isParamChange) {
     persistedParams.current = params;
@@ -73,8 +73,6 @@ function useRead<T extends DBRecord>(
   );
 
   if (!db) return null;
-
-  console.log(isParamChange, persistedParams.current, params);
 
   if (
     !isParamChange &&
@@ -104,4 +102,52 @@ function createResultWithTransactionCount<T>(
 
 function onError(event: Event): void {
   throw new Error(event.type);
+}
+
+function compareParams<T>(
+  a: UseReadParams<T> | null | undefined,
+  b: UseReadParams<T> | null | undefined,
+): boolean {
+  const isAFalsy = a === null || a === undefined;
+  const isBFalsy = b === null || b === undefined;
+  if (isAFalsy || isBFalsy) {
+    return isAFalsy && isBFalsy;
+  }
+  function simpleCompare(selector: string): boolean {
+    return a![selector] === b![selector];
+  }
+  if (!compareField(a!, b!, 'filter', simpleCompare)) {
+    return false;
+  }
+  if (!compareField(a!, b!, 'key', simpleCompare)) {
+    return false;
+  }
+  if (!compareField(a!, b!, 'direction', simpleCompare)) {
+    return false;
+  }
+  if (!compareField(a!, b!, 'index', simpleCompare)) {
+    return false;
+  }
+  if (!compareField(a!, b!, 'returnWithKey', simpleCompare)) {
+    return false;
+  }
+  if (!compareField(a!, b!, 'keyRange', () => compareStringifiedObjects(a, b))) {
+    return false;
+  }
+  return true;
+}
+
+function hasField(object: Record<string, unknown>, selector: string) {
+  return object[selector] !== null && object[selector] !== undefined;
+}
+
+function compareField(
+  a: Record<string, unknown>,
+  b: Record<string, unknown>,
+  selector: string,
+  compare: (selector: string) => boolean,
+): boolean {
+  if (hasField(a, selector) !== hasField(b, selector)) return false;
+  if (!hasField(a, selector)) return true;
+  return compare(selector);
 }

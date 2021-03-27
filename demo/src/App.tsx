@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useUpdate } from 'indexeddb-hooked';
 import AddFruit from './components/AddFruit';
 import FruitsBasket from './components/FruitsBasket';
@@ -13,12 +13,17 @@ function App() {
   const [replace, setReplace] = useState(false);
   const update = useUpdate();
 
+  const filter = useCallback((value) => value.length === filterValue, [filterValue]);
+
   return (
     <div className="App">
       <FruitsBasket params={{ direction: 'next' }} />
       <AddFruit />
-      <FruitsBasket params={{ filter: (value) => value.length === filterValue }} />
-      <input onChange={(e) => setFilterValue(Number(e.target.value))} />
+      <FruitsBasket params={{ filter }} />
+      <input
+        placeholder="name length filter"
+        onChange={(e) => setFilterValue(Number(e.target.value))}
+      />
       <FruitsBasket params={{ direction }} />
       <form>
         <select onChange={(e) => setDirection(e.target.value as IDBCursorDirection)}>

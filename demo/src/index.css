@@ -12,12 +12,12 @@ code {
 
 @keyframes alert {
   from {
-    background-color: yellow;
+    background-color: #ffff8f;
   }
   to {
     background-color: white;
   }
 }
 ul {
-  animation: alert 200ms;
+  animation: alert 1s;
 }
