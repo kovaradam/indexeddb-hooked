@@ -1,6 +1,6 @@
 import { Config, ObjectStoreParams } from './model';
 import Store from './store';
-import { createPromiseWithOutsideResolvers } from './utils';
+import { createPromiseWithOutsideResolvers, usesInlineKeys } from './utils';
 
 export const openDB = (config: Config): Promise<IDBDatabase> => {
   const name = config.name || 'indexeddb-hooked';
@@ -87,13 +87,17 @@ function upgradeStores(
       // Store values in the newly created objectStore.
       const dataObjectStore = db.transaction(name, 'readwrite').objectStore(name);
       data.forEach((item) => {
-        if (dataObjectStore.keyPath || dataObjectStore.autoIncrement) {
+        if (usesInlineKeys(dataObjectStore)) {
           dataObjectStore.add(item);
         } else {
           if (!dataKey) {
             throw new Error('Store uses out-of-line key and dataKey was not provided');
           }
-          dataObjectStore.add(item, (item as { [key: string]: IDBValidKey })[dataKey]);
+          const itemKey = (item as { [key: string]: IDBValidKey })[dataKey];
+          if (!itemKey) {
+            throw new Error('DataKey does not exist on provided object');
+          }
+          dataObjectStore.add(item, itemKey);
         }
       });
     });

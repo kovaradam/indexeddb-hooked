@@ -6,7 +6,7 @@ import {
   ResultWithKey,
 } from '../model';
 import { asyncRead } from '../operators/read';
-import { compareStringifiedObjects } from '../utils';
+import { compareStringifiedObjects, isDevelopment } from '../utils';
 import useDB from './use-db';
 
 type ResultWithTransactionCount<T> = {
@@ -47,7 +47,7 @@ function useRead<T extends DBRecord>(
   );
 
   const persistedParams = useRef(params);
-  const isParamChange = useRef(params).current !== params;
+  const isParamChange = !compareStringifiedObjects(persistedParams.current, params);
 
   if (isParamChange) {
     persistedParams.current = params;
@@ -74,6 +74,8 @@ function useRead<T extends DBRecord>(
 
   if (!db) return null;
 
+  console.log(isParamChange, persistedParams.current, params);
+
   if (
     !isParamChange &&
     lastResult.value &&
@@ -82,8 +84,8 @@ function useRead<T extends DBRecord>(
     return lastResult.value;
   }
 
-  function onError(event: Event): void {
-    throw new Error(event.type);
+  if (isDevelopment()) {
+    lastResult.value = null;
   }
 
   asyncRead<T>(storeName, { ...params, db, onSuccess, onError });
@@ -98,4 +100,8 @@ function createResultWithTransactionCount<T>(
   transactionCount: number,
 ): ResultWithTransactionCount<T> {
   return { value, transactionCount };
+}
+
+function onError(event: Event): void {
+  throw new Error(event.type);
 }

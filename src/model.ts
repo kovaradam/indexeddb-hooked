@@ -22,7 +22,7 @@ export type UpdateData = {
   replace?: boolean;
 };
 
-export interface ReadParams<T = any> {
+export interface ReadParams<T = any> extends Record<string, unknown> {
   key?: IDBValidKey;
   keyRange?: IDBKeyRange;
   direction?: IDBCursorDirection;

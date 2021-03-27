@@ -11,7 +11,7 @@ function useUpdate(): Updater<void> {
     renderOnUpdate = true,
   ): void {
     const onError = (event: Event): void => {
-      throw new Error(event.type);
+      throw new Error((event.target as IDBRequest).error?.message || '');
     };
 
     const onComplete = (_: Event): void => {

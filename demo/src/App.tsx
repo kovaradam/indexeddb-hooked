@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useUpdate } from 'indexeddb-hooked';
 import AddFruit from './components/AddFruit';
 import FruitsBasket from './components/FruitsBasket';
 
@@ -7,6 +8,10 @@ function App() {
   const [direction, setDirection] = useState<IDBCursorDirection>('next');
   const [index, setIndex] = useState('by_name');
   const [name, setName] = useState('apple');
+  const [key, setKey] = useState<number | string>(0);
+  const [selector, setSelector] = useState('name');
+  const [replace, setReplace] = useState(false);
+  const update = useUpdate();
 
   return (
     <div className="App">
@@ -36,6 +41,50 @@ function App() {
           <option value="by_taste">by_taste</option>
         </select>
         <input onChange={(e) => setName(String(e.target.value))} />
+      </form>
+      <FruitsBasket storeName="fruits-obj" params={{ returnWithKey: true }} />
+      <form onSubmit={(e) => e.preventDefault()}>
+        <input placeholder="key" onChange={(e) => setKey(Number(e.target.value))} />
+        <input
+          placeholder="selector"
+          onChange={(e) => setSelector(String(e.target.value))}
+        />
+        <input
+          placeholder="name"
+          onChange={(e) => {
+            const value: Record<string, string> = {};
+            value[selector] = String(e.target.value);
+            update('fruits-obj', { value: value, key, replace });
+          }}
+        />
+        <input
+          type="checkbox"
+          checked={replace}
+          onChange={() => setReplace((replace) => !replace)}
+        />{' '}
+        Replace
+      </form>
+      <FruitsBasket storeName="fruits-obj-nokey" params={{ returnWithKey: true }} />
+      <form onSubmit={(e) => e.preventDefault()}>
+        <input placeholder="key" onChange={(e) => setKey(e.target.value)} />
+        <input
+          placeholder="selector"
+          onChange={(e) => setSelector(String(e.target.value))}
+        />
+        <input
+          placeholder="name"
+          onChange={(e) => {
+            const value: Record<string, string> = {};
+            value[selector] = String(e.target.value);
+            update('fruits-obj-nokey', { value: value, key, replace });
+          }}
+        />
+        <input
+          type="checkbox"
+          checked={replace}
+          onChange={() => setReplace((replace) => !replace)}
+        />{' '}
+        Replace
       </form>
     </div>
   );

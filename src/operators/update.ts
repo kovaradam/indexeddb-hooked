@@ -1,6 +1,6 @@
 import { UpdateData, Updater } from '../model';
 import Store from '../store';
-import { createPromiseWithOutsideResolvers } from '../utils';
+import { createPromiseWithOutsideResolvers, usesInlineKeys } from '../utils';
 
 type AsyncUpdateParams = {
   data: UpdateData | UpdateData[];
@@ -65,7 +65,14 @@ function put(data: UpdateData, objectStore: IDBObjectStore): void {
     return;
   }
   if (replace) {
-    objectStore.put(value, key as IDBValidKey);
+    if (usesInlineKeys(objectStore)) {
+      if (!value![objectStore.keyPath as string]) {
+        value![objectStore.keyPath as string] = key;
+      }
+      objectStore.put(value);
+    } else {
+      objectStore.put(value, key as IDBValidKey);
+    }
     return;
   }
 
@@ -77,7 +84,7 @@ function put(data: UpdateData, objectStore: IDBObjectStore): void {
     } else {
       DBObject = value;
     }
-    if (!objectStore.keyPath) {
+    if (!usesInlineKeys(objectStore)) {
       objectStore.put(DBObject, key as IDBValidKey);
     } else {
       objectStore.put(DBObject);
@@ -87,7 +94,7 @@ function put(data: UpdateData, objectStore: IDBObjectStore): void {
 
 function deleteItem(data: UpdateData, objectStore: IDBObjectStore): void {
   if (data.key === undefined) {
-    throw new Error(`Error: Can't delete item without providing it's key!`);
+    throw new Error(`Error: Can't delete item without providing its key!`);
   }
   objectStore.delete(data.key);
 }

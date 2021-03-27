@@ -69,5 +69,9 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
+  },
+  "dependencies": {
+    "@types/node": "^14.14.37",
+    "dotenv": "^8.2.0"
   }
 }

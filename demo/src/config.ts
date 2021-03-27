@@ -1,5 +1,11 @@
 import { Config } from 'indexeddb-hooked';
 
+const objData = [
+  { color: 'green', taste: 'sweet', name: 'apple' },
+  { color: 'red', taste: 'sweet', name: 'cherry' },
+  { color: 'yellow', taste: 'sour', name: 'lemon' },
+];
+
 const config: Config = {
   name: 'FruitDB',
   version: 1,
@@ -19,11 +25,14 @@ const config: Config = {
         { name: 'by_taste', keyPath: 'taste' },
         { name: 'by_color', keyPath: 'color' },
       ],
-      data: [
-        { color: 'green', taste: 'sweet', name: 'apple' },
-        { color: 'red', taste: 'sweet', name: 'cherry' },
-        { color: 'yellow', taste: 'sour', name: 'lemon' },
-      ],
+      data: objData,
+    },
+    {
+      name: 'fruits-obj-nokey',
+      // +keypath -autoIncrement: values must have the key value, value is not generated separately
+      // +keypath +autoIncrement: values dont have to have key value, value can be generated separately
+      data: objData,
+      dataKey: 'name',
     },
   ],
   onOpenSuccess: () => console.log('DB is open and delicious'),
