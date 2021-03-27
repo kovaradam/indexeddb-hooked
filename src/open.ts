@@ -7,6 +7,8 @@ export const openDB = (config: Config): Promise<IDBDatabase> => {
   const version = config.version || 1;
   const DBOpenRequest = window.indexedDB.open(name, version);
 
+  Store._isDevelopment = config._isDevelopment || false;
+
   const [promise, promiseResolve, promiseReject] = createPromiseWithOutsideResolvers<
     IDBDatabase,
     string

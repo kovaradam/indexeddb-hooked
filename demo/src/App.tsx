@@ -11,6 +11,7 @@ function App() {
   const [key, setKey] = useState<number | string>(0);
   const [selector, setSelector] = useState('name');
   const [replace, setReplace] = useState(false);
+  const [keyRange, setKeyRange] = useState({ lower: 2, upper: 3 });
   const update = useUpdate();
 
   const filter = useCallback((value) => value.length === filterValue, [filterValue]);
@@ -68,6 +69,33 @@ function App() {
           onChange={() => setReplace((replace) => !replace)}
         />{' '}
         Replace
+      </form>
+      <FruitsBasket
+        storeName="fruits-obj"
+        params={{
+          returnWithKey: true,
+          keyRange: IDBKeyRange.bound(keyRange.lower, keyRange.upper),
+        }}
+      />
+      <form onSubmit={(e) => e.preventDefault()}>
+        <input
+          placeholder={'lower bound = ' + keyRange.lower}
+          onChange={(e) =>
+            setKeyRange((prevRange) => ({
+              ...prevRange,
+              lower: Number(e.target.value),
+            }))
+          }
+        />
+        <input
+          placeholder={'upper bound = ' + keyRange.upper}
+          onChange={(e) =>
+            setKeyRange((prevRange) => ({
+              ...prevRange,
+              upper: Number(e.target.value),
+            }))
+          }
+        />
       </form>
       <FruitsBasket storeName="fruits-obj-nokey" params={{ returnWithKey: true }} />
       <form onSubmit={(e) => e.preventDefault()}>

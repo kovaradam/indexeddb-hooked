@@ -36,6 +36,7 @@ const config: Config = {
     },
   ],
   onOpenSuccess: () => console.log('DB is open and delicious'),
+  _isDevelopment: true,
 };
 
 export default config;

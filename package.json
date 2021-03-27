@@ -1,6 +1,6 @@
 {
   "name": "indexeddb-hooked",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "IndexedDB adapter for React",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "rm -rf lib && tsc",
+    "dev": "tsc -w",
     "test": "echo \"No test specified\" && exit 0"
   },
   "repository": {
@@ -69,9 +70,5 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "dependencies": {
-    "@types/node": "^14.14.37",
-    "dotenv": "^8.2.0"
   }
 }

@@ -6,7 +6,8 @@ import {
   ResultWithKey,
 } from '../model';
 import { asyncRead } from '../operators/read';
-import { compareStringifiedObjects, isDevelopment } from '../utils';
+import Store from '../store';
+import { compareStringifiedObjects } from '../utils';
 import useDB from './use-db';
 
 type ResultWithTransactionCount<T> = {
@@ -82,7 +83,7 @@ function useRead<T extends DBRecord>(
     return lastResult.value;
   }
 
-  if (isDevelopment()) {
+  if (Store._isDevelopment) {
     lastResult.value = null;
   }
 
@@ -104,6 +105,7 @@ function onError(event: Event): void {
   throw new Error(event.type);
 }
 
+// WIP
 function compareParams<T>(
   a: UseReadParams<T> | null | undefined,
   b: UseReadParams<T> | null | undefined,
@@ -116,38 +118,38 @@ function compareParams<T>(
   function simpleCompare(selector: string): boolean {
     return a![selector] === b![selector];
   }
-  if (!compareField(a!, b!, 'filter', simpleCompare)) {
+  if (!simpleCompare('filter')) {
     return false;
   }
-  if (!compareField(a!, b!, 'key', simpleCompare)) {
+  if (!simpleCompare('key')) {
     return false;
   }
-  if (!compareField(a!, b!, 'direction', simpleCompare)) {
+  if (!simpleCompare('direction')) {
     return false;
   }
-  if (!compareField(a!, b!, 'index', simpleCompare)) {
+  if (!simpleCompare('index')) {
     return false;
   }
-  if (!compareField(a!, b!, 'returnWithKey', simpleCompare)) {
+  if (!simpleCompare('returnWithKey')) {
     return false;
   }
-  if (!compareField(a!, b!, 'keyRange', () => compareStringifiedObjects(a, b))) {
+  if (!simpleCompare('filter')) {
+    return false;
+  }
+  if (a?.keyRange?.lower !== b?.keyRange?.lower) {
+    return false;
+  }
+  if (a?.keyRange?.upper !== b?.keyRange?.upper) {
+    return false;
+  }
+  if (a?.keyRange?.lowerOpen !== b?.keyRange?.lowerOpen) {
+    return false;
+  }
+  if (a?.keyRange?.upperOpen !== b?.keyRange?.upperOpen) {
+    return false;
+  }
+  if (a?.keyRange?.includes !== b?.keyRange?.includes) {
     return false;
   }
   return true;
-}
-
-function hasField(object: Record<string, unknown>, selector: string) {
-  return object[selector] !== null && object[selector] !== undefined;
-}
-
-function compareField(
-  a: Record<string, unknown>,
-  b: Record<string, unknown>,
-  selector: string,
-  compare: (selector: string) => boolean,
-): boolean {
-  if (hasField(a, selector) !== hasField(b, selector)) return false;
-  if (!hasField(a, selector)) return true;
-  return compare(selector);
 }

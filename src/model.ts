@@ -54,6 +54,7 @@ export type Config = {
   onUpgradeNeeded?:
     | ((event: IDBVersionChangeEvent, objectStores: ObjectStoreParams[]) => void)
     | (() => void);
+  _isDevelopment?: boolean;
 };
 
 export type ResultWithKey<T> = { value: T; key: IDBValidKey };

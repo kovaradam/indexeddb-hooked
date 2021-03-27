@@ -1,13 +1,3 @@
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-export function isDevelopment() {
-  console.log(process.env._INDEXEDDB_HOOKED_ENV);
-  return process.env.NODE_ENV === 'development';
-}
-isDevelopment();
-
 type OutsideResolve<T> = (value: T) => void;
 type OutsideReject<T> = (reason: T) => void;
 

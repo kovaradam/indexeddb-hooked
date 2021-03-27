@@ -1,6 +1,7 @@
 class Store {
   private static db: IDBDatabase;
   public static triggerUpdate: (storeName: string) => void;
+  public static _isDevelopment = false;
 
   public static setDB = (db: typeof Store.db): void => {
     Store.db = db;
