@@ -29,10 +29,20 @@ const config: Config = {
     },
     {
       name: 'fruits-obj-nokey',
-      // +keypath -autoIncrement: values must have the key value, value is not generated separately
-      // +keypath +autoIncrement: values dont have to have key value, value can be generated separately
       data: objData,
       dataKey: 'name',
+    },
+    {
+      name: 'fruits-obj-keygen-only',
+      options: { autoIncrement: true },
+      data: objData,
+    },
+    {
+      name: 'fruits-obj-keypath-only',
+      options: { keyPath: 'id' },
+      data: objData.map((data: Record<string, unknown>) => {
+        return { ...data, id: (Math.random() * 100).toFixed(0) };
+      }),
     },
   ],
   onOpenSuccess: () => console.log('DB is open and delicious'),

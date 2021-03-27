@@ -1,9 +1,9 @@
-import { ReadParams, useRead } from 'indexeddb-hooked';
+import { DBRecord, ReadParams, useRead } from 'indexeddb-hooked';
 
-type Props = { params?: ReadParams<string>; storeName?: string };
+type Props = { params?: ReadParams<DBRecord>; storeName?: string };
 
 const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
-  const fruits = useRead<string>(storeName || 'fruits', params);
+  const fruits = useRead<DBRecord>(storeName || 'fruits', params);
 
   if (!fruits) return <div>Loading</div>;
   /* Since IDB operations are asynchronous, useRead returns `null`

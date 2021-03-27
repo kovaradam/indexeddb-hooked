@@ -21,3 +21,14 @@ code {
 ul {
   animation: alert 1s;
 }
+
+summary {
+  color: pink;
+}
+summary:hover {
+  cursor: pointer;
+}
+
+span {
+  font-size: 1.3rem;
+}
