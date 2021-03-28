@@ -2,7 +2,7 @@ import { Config, ObjectStoreParams } from './model';
 import Store from './store';
 import { createPromiseWithOutsideResolvers, usesInlineKeys } from './utils';
 
-export const openDB = (config: Config): Promise<IDBDatabase> => {
+const open = (config: Config): Promise<IDBDatabase> => {
   const name = config.name || 'indexeddb-hooked';
   const version = config.version || 1;
   const DBOpenRequest = window.indexedDB.open(name, version);
@@ -26,6 +26,7 @@ export const openDB = (config: Config): Promise<IDBDatabase> => {
       throw new Error((event.target as IDBRequest)?.error + '');
     };
     Store.setDB(db);
+    Store.wake();
     promiseResolve(db);
     if (config.onOpenSuccess) {
       config.onOpenSuccess(event);
@@ -58,6 +59,8 @@ export const openDB = (config: Config): Promise<IDBDatabase> => {
   DBOpenRequest.onupgradeneeded = onUpgradeNeeded;
   return promise;
 };
+
+export default open;
 
 function upgradeStores(
   params: ObjectStoreParams[],

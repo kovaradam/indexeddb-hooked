@@ -4,13 +4,13 @@ import { createPromiseWithOutsideResolvers } from '../utils';
 
 type AsyncUpdateParams = {
   data: UpdateData | UpdateData[];
-  db: IDBDatabase | null;
   onComplete: (event: Event) => void;
   onError?: (event: Event) => void;
 };
 
 export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void {
-  const { data, db, onComplete } = params;
+  const { data, onComplete } = params;
+  const db = Store.getDB();
   if (!db) {
     throw new Error('Error: database is not open');
   }
@@ -44,14 +44,14 @@ const update: Updater<Promise<null>> = (
   const [promise, resolve, reject] = createPromiseWithOutsideResolvers<null, string>();
   function onComplete(): void {
     if (renderOnUpdate !== false) {
-      Store.triggerUpdate(storeName);
+      Store.trigger(storeName);
     }
     resolve(null);
   }
   function onError(event: Event): void {
     reject(event.type);
   }
-  asyncUpdate(storeName, { data, db: Store.getDB(), onComplete, onError });
+  asyncUpdate(storeName, { data, onComplete, onError });
   return promise;
 };
 

@@ -1,10 +1,8 @@
-import useDB from './use-db';
 import { asyncUpdate } from '../operators/update';
 import { UpdateData, Updater } from '../model';
+import Store from '../store';
 
 function useUpdate(): Updater<void> {
-  const { db, triggerUpdate } = useDB();
-
   function update(
     storeName: string,
     data: UpdateData | UpdateData[],
@@ -16,11 +14,11 @@ function useUpdate(): Updater<void> {
 
     const onComplete = (_: Event): void => {
       if (renderOnUpdate) {
-        triggerUpdate(storeName);
+        Store.trigger(storeName);
       }
     };
 
-    asyncUpdate(storeName, { data, db, onComplete, onError });
+    asyncUpdate(storeName, { data, onComplete, onError });
   }
   return update;
 }

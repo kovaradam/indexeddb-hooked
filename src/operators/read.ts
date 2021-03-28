@@ -8,7 +8,6 @@ import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
 interface AsyncReadParams<T> extends BaseReadParams<T> {
-  db: IDBDatabase | null;
   onSuccess: (result: ReadResult<T>, event: Event) => void;
   onError?: (event: Event) => void;
 }
@@ -16,7 +15,8 @@ interface AsyncReadParams<T> extends BaseReadParams<T> {
 const defaultDirection = 'next';
 
 export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): void {
-  const { db, onSuccess } = params;
+  const { onSuccess } = params;
+  const db = Store.getDB();
 
   if (!db) {
     throw new Error('Error: database is not open');

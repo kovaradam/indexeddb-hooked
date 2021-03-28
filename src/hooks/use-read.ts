@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ReadParams as BaseReadParams,
   DBRecord,
@@ -8,7 +8,6 @@ import {
 import { asyncRead } from '../operators/read';
 import Store from '../store';
 import { compareStringifiedObjects } from '../utils';
-import useDB from './use-db';
 
 type ResultWithTransactionCount<T> = {
   value: ReadResult<T> | null;
@@ -41,11 +40,12 @@ function useRead<T extends DBRecord>(
   storeName: string,
   params?: UseReadParams<T>,
 ): ReadResult<T> | null {
-  const { db, transactionCountStore } = useDB();
-  const transactionCount = transactionCountStore[storeName];
+  const [transactionCount, setTransactionCount] = useState(-1);
   const [lastResult, setLastResult] = useState(
     createResultWithTransactionCount<T>(null, transactionCount),
   );
+
+  useEffect(() => Store.subscribe(storeName, setTransactionCount), [storeName]);
 
   const persistedParams = useRef(params);
   const isParamChange = !areParamsEqueal(persistedParams.current, params);
@@ -67,13 +67,14 @@ function useRead<T extends DBRecord>(
         )
       ) {
         const newResult = createResultWithTransactionCount<T>(result, transactionCount);
+
         setLastResult(newResult);
       }
     },
     [lastResult.value, transactionCount],
   );
 
-  if (!db) return null;
+  if (!Store.getDB()) return null;
 
   if (
     !isParamChange &&
@@ -87,7 +88,7 @@ function useRead<T extends DBRecord>(
     lastResult.value = null;
   }
 
-  asyncRead<T>(storeName, { ...params, db, onSuccess, onError });
+  asyncRead<T>(storeName, { ...params, onSuccess, onError });
 
   return lastResult.value;
 }
