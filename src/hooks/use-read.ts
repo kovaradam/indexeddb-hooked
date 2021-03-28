@@ -48,7 +48,7 @@ function useRead<T extends DBRecord>(
   );
 
   const persistedParams = useRef(params);
-  const isParamChange = !compareParams(persistedParams.current, params);
+  const isParamChange = !areParamsEqueal(persistedParams.current, params);
 
   if (isParamChange) {
     persistedParams.current = params;
@@ -106,50 +106,48 @@ function onError(event: Event): void {
 }
 
 // WIP
-function compareParams<T>(
+export function areParamsEqueal<T>(
   a: UseReadParams<T> | null | undefined,
   b: UseReadParams<T> | null | undefined,
 ): boolean {
-  const isAFalsy = a === null || a === undefined;
-  const isBFalsy = b === null || b === undefined;
-  if (isAFalsy || isBFalsy) {
-    return isAFalsy && isBFalsy;
+  if (!a || !b) {
+    return !a && !b;
   }
-  function simpleCompare(selector: string): boolean {
-    return a![selector] === b![selector];
+  const [keysA, keysB] = [Object.keys(a!), Object.keys(b!)];
+  if (keysA.length !== keysB.length) return false;
+
+  for (let i = 0; i < keysA.length; i++) {
+    const key = keysA[i];
+    if (key !== keysB[i]) {
+      return false;
+    }
+    const [valueA, valueB] = [a![key], b![key]];
+    switch (key) {
+      case 'keyRange':
+        // IDBKeyrange acts weird
+        if (a?.keyRange?.lower !== b?.keyRange?.lower) {
+          return false;
+        }
+        if (a?.keyRange?.upper !== b?.keyRange?.upper) {
+          return false;
+        }
+        if (a?.keyRange?.lowerOpen !== b?.keyRange?.lowerOpen) {
+          return false;
+        }
+        if (a?.keyRange?.upperOpen !== b?.keyRange?.upperOpen) {
+          return false;
+        }
+        if (a?.keyRange?.includes !== b?.keyRange?.includes) {
+          return false;
+        }
+        break;
+      default:
+        if (valueA !== valueB) {
+          return false;
+        }
+        break;
+    }
   }
-  if (!simpleCompare('filter')) {
-    return false;
-  }
-  if (!simpleCompare('key')) {
-    return false;
-  }
-  if (!simpleCompare('direction')) {
-    return false;
-  }
-  if (!simpleCompare('index')) {
-    return false;
-  }
-  if (!simpleCompare('returnWithKey')) {
-    return false;
-  }
-  if (!simpleCompare('filter')) {
-    return false;
-  }
-  if (a?.keyRange?.lower !== b?.keyRange?.lower) {
-    return false;
-  }
-  if (a?.keyRange?.upper !== b?.keyRange?.upper) {
-    return false;
-  }
-  if (a?.keyRange?.lowerOpen !== b?.keyRange?.lowerOpen) {
-    return false;
-  }
-  if (a?.keyRange?.upperOpen !== b?.keyRange?.upperOpen) {
-    return false;
-  }
-  if (a?.keyRange?.includes !== b?.keyRange?.includes) {
-    return false;
-  }
+
   return true;
 }
