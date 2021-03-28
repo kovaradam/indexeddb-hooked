@@ -1,14 +1,12 @@
-type StoreRecord = {
+type StoreSubscription = {
   triggers: ((transactionCount: number) => void)[];
   transactionCount: number;
 };
 
 class Store {
   private static db: IDBDatabase;
-  public static triggers: Record<string, StoreRecord> = {};
-
+  public static subscriptions: Record<string, StoreSubscription> = {};
   public static _isDevelopment = false;
-
   public static setDB = (db: typeof Store.db): void => {
     Store.db = db;
   };
@@ -19,30 +17,33 @@ class Store {
     storeName: string,
     trigger: (count: number) => void,
   ): (() => void) => {
-    if (!Store.triggers[storeName]) {
-      Store.triggers[storeName] = { transactionCount: 0, triggers: [] };
+    if (!Store.subscriptions[storeName]) {
+      Store.subscriptions[storeName] = { transactionCount: 0, triggers: [] };
     }
-    Store.triggers[storeName].triggers.push(trigger);
-    return () => {
-      console.log(Store.triggers[storeName].triggers.length);
-      Store.triggers[storeName].triggers = Store.triggers[storeName].triggers.filter(
-        (t) => t !== trigger,
-      );
-      console.log(Store.triggers[storeName].triggers.length);
-    };
+    Store.subscriptions[storeName].triggers.push(trigger);
+
+    function unsubscribe() {
+      Store.subscriptions[storeName].triggers = Store.subscriptions[
+        storeName
+      ].triggers.filter((t) => t !== trigger);
+    }
+
+    return unsubscribe;
   };
 
   public static trigger = (storeName: string): void => {
-    const { triggers, transactionCount } = Store.triggers[storeName];
-    Store.triggers[storeName].transactionCount = transactionCount + 1;
+    const { triggers, transactionCount } = Store.subscriptions[storeName];
+    Store.subscriptions[storeName].transactionCount = transactionCount + 1;
     if (!triggers) {
       return;
     }
-    triggers.forEach((trigger) => trigger(Store.triggers[storeName].transactionCount));
+    triggers.forEach((trigger) =>
+      trigger(Store.subscriptions[storeName].transactionCount),
+    );
   };
 
   public static wake = (): void => {
-    const storeNames = Object.keys(Store.triggers);
+    const storeNames = Object.keys(Store.subscriptions);
     storeNames.forEach((storeName) => {
       Store.trigger(storeName);
     });
