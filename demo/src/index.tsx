@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { IndexedDBProvider } from 'indexeddb-hooked';
+import { open } from 'indexeddb-hooked';
 import config from './config';
+
+open(config);
 
 ReactDOM.render(
   <React.StrictMode>
-    <IndexedDBProvider config={config}>
-      <App />
-    </IndexedDBProvider>
+    <App />
   </React.StrictMode>,
   document.getElementById('root'),
 );
