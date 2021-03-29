@@ -1,4 +1,4 @@
-import { UpdateData, Updater } from '../model';
+import { DBRecord, UpdateData, Updater } from '../model';
 import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
@@ -9,8 +9,10 @@ type AsyncUpdateParams = {
 };
 
 export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void {
-  const { data, onComplete } = params;
+  const { onComplete } = params;
+  let { data } = params;
   const db = Store.getDB();
+
   if (!db) {
     throw new Error('Error: database is not open');
   }
@@ -26,14 +28,15 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
     onComplete(event);
   };
   if ((data as UpdateData[]).length === undefined) {
-    if ((data as UpdateData).value !== null) {
-      put(data as UpdateData, objectStore);
-    } else {
-      deleteItem(data as UpdateData, objectStore);
-    }
-  } else {
-    (data as UpdateData[]).forEach((item) => put(item, objectStore));
+    data = [data as UpdateData];
   }
+  (data as UpdateData[]).forEach((item) => {
+    if ((item as UpdateData).value !== null) {
+      put(item as PutUpdateData, objectStore);
+    } else {
+      deleteItem(item as UpdateData, objectStore);
+    }
+  });
 }
 
 const update: Updater<Promise<null>> = (
@@ -57,7 +60,11 @@ const update: Updater<Promise<null>> = (
 
 export default update;
 
-function put(data: UpdateData, objectStore: IDBObjectStore): void {
+interface PutUpdateData extends UpdateData {
+  value: DBRecord;
+}
+
+function put(data: PutUpdateData, objectStore: IDBObjectStore): void {
   const { value, key, replace } = data;
 
   if (!key) {
@@ -66,9 +73,6 @@ function put(data: UpdateData, objectStore: IDBObjectStore): void {
   }
   if (replace) {
     if (objectStore.keyPath !== null) {
-      if (!value![objectStore.keyPath as string]) {
-        value![objectStore.keyPath as string] = key;
-      }
       objectStore.put(value);
     } else {
       objectStore.put(value, key as IDBValidKey);
@@ -84,7 +88,7 @@ function put(data: UpdateData, objectStore: IDBObjectStore): void {
     } else {
       DBObject = value;
     }
-    if (!objectStore.keyPath) {
+    if (objectStore.keyPath === null) {
       objectStore.put(DBObject, key as IDBValidKey);
     } else {
       objectStore.put(DBObject);

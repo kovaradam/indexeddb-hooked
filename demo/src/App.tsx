@@ -12,6 +12,7 @@ function App() {
       <FruitsObjNoKey />
       <FruitsObjKeyGenOnly />
       <FruitsObjKeyPathOnly />
+      <FruitsObjMultipleKeyPathOnly />
     </div>
   );
 }
@@ -54,11 +55,11 @@ function FruitsObjKeyGenOnly() {
   );
 }
 function FruitsObjKeyPathOnly() {
-  const [key, setKey] = useState<number | string>(0);
+  const [key, setKey] = useState<string>('0');
   const update = useUpdate();
   const [selector, setSelector] = useState('name');
   const [replace, setReplace] = useState(false);
-
+  const keyPath = 'id';
   return (
     <Details name={'fruits-obj-keypath-only'}>
       <FruitsBasket
@@ -77,7 +78,69 @@ function FruitsObjKeyPathOnly() {
           onChange={(e) => {
             const value: Record<string, string> = {};
             value[selector] = String(e.target.value);
+            if (replace) value[keyPath] = key;
             update('fruits-obj-keypath-only', { value: value, key, replace });
+          }}
+          autoComplete="on"
+        />
+        <input
+          type="checkbox"
+          checked={replace}
+          onChange={() => setReplace((replace) => !replace)}
+        />{' '}
+        Replace
+      </form>
+    </Details>
+  );
+}
+function FruitsObjMultipleKeyPathOnly() {
+  const [keys, setKeys] = useState<[string, string]>(['apple', 'sweet']);
+  const update = useUpdate();
+  const [selector, setSelector] = useState('name');
+  const [replace, setReplace] = useState(false);
+  const storeName = 'fruits-obj-multiple-keypath-only';
+  return (
+    <Details name={storeName}>
+      <FruitsBasket storeName={storeName} params={{ returnWithKey: true, key: keys }} />
+      <form onSubmit={(e) => e.preventDefault()}>
+        <input
+          placeholder={'key1 = ' + keys[0]}
+          onChange={(e) => setKeys([e.target.value, keys[1]])}
+        />
+        <input
+          placeholder={'key2 = ' + keys[1]}
+          onChange={(e) => setKeys([keys[0], e.target.value])}
+        />
+      </form>
+      <FruitsBasket storeName={storeName} params={{ returnWithKey: true }} />
+      <form onSubmit={(e) => e.preventDefault()}>
+        <input
+          placeholder={'key1 = ' + keys[0]}
+          onChange={(e) => setKeys([e.target.value, keys[1]])}
+        />
+        <input
+          placeholder={'key2 = ' + keys[1]}
+          onChange={(e) => setKeys([keys[0], e.target.value])}
+        />
+        <input
+          placeholder="selector"
+          onChange={(e) => setSelector(String(e.target.value))}
+          autoComplete="on"
+        />
+        <input
+          placeholder="name"
+          onChange={(e) => {
+            const value: Record<string, string> = {};
+            value[selector] = String(e.target.value);
+            if (replace) {
+              value['name'] = keys[0];
+              value['taste'] = keys[1];
+            }
+            update(storeName, {
+              value: value,
+              key: keys,
+              replace,
+            });
           }}
           autoComplete="on"
         />
@@ -102,11 +165,12 @@ const Fruits: React.FC = () => {
       <AddFruit />
       <FruitsBasket params={{ filter }} />
       <input
+        autoComplete="on"
         placeholder={'name length filter = ' + filterValue}
         onChange={(e) => setFilterValue(Number(e.target.value))}
       />
       <FruitsBasket params={{ direction }} />
-      <form>
+      <form autoComplete="on">
         <select onChange={(e) => setDirection(e.target.value as IDBCursorDirection)}>
           <option value="next">next</option>
           <option value="prev">prev</option>
@@ -119,26 +183,28 @@ const Fruits: React.FC = () => {
 };
 
 const FruitsObjNoKey: React.FC = () => {
-  const [key, setKey] = useState<number | string>(0);
+  const [key, setKey] = useState<string>('apple');
   const update = useUpdate();
-  const [selector, setSelector] = useState('name');
+  const keyPath = 'name';
+  const [selector, setSelector] = useState(keyPath);
   const [replace, setReplace] = useState(false);
 
   return (
     <Details name={'fruits-obj-nokey'}>
       <FruitsBasket storeName="fruits-obj-nokey" params={{ returnWithKey: true }} />
       <form onSubmit={(e) => e.preventDefault()}>
-        <input placeholder="key" onChange={(e) => setKey(e.target.value)} />
+        <input placeholder={'key = ' + key} onChange={(e) => setKey(e.target.value)} />
         <input
-          placeholder="selector"
+          placeholder={'selector = ' + selector}
           onChange={(e) => setSelector(String(e.target.value))}
           autoComplete="on"
         />
         <input
-          placeholder="name"
+          placeholder={'value'}
           onChange={(e) => {
             const value: Record<string, string> = {};
             value[selector] = String(e.target.value);
+            // value[keyPath] = key;
             update('fruits-obj-nokey', { value: value, key, replace });
           }}
           autoComplete="on"
@@ -160,9 +226,10 @@ const FruitsObj: React.FC = () => {
   const [keyRange, setKeyRange] = useState({ lower: 2, upper: 3 });
   const [index, setIndex] = useState('by_name');
   const [selector, setSelector] = useState('name');
-  const [key, setKey] = useState<number | string>(0);
+  const [key, setKey] = useState<number>(0);
   const update = useUpdate();
   const [replace, setReplace] = useState(false);
+  const keyPath = 'id';
   return (
     <Details name={'fruits-obj'}>
       <FruitsBasket storeName="fruits-obj" />
@@ -181,13 +248,13 @@ const FruitsObj: React.FC = () => {
           <option value="by_taste">by_taste</option>
         </select>
         <input
-          placeholder={'key value = ' + name}
+          placeholder={'value = ' + name}
           onChange={(e) => setName(String(e.target.value))}
           autoComplete="on"
         />
       </form>
       <FruitsBasket storeName="fruits-obj" params={{ returnWithKey: true }} />
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={(e) => e.preventDefault()} autoComplete="on">
         <input placeholder="key" onChange={(e) => setKey(Number(e.target.value))} />
         <input
           placeholder="selector"
@@ -197,8 +264,9 @@ const FruitsObj: React.FC = () => {
         <input
           placeholder="name"
           onChange={(e) => {
-            const value: Record<string, string> = {};
+            const value: Record<string, string | number> = {};
             value[selector] = String(e.target.value);
+            if (replace) value[keyPath] = key;
             update('fruits-obj', { value: value, key, replace });
           }}
           autoComplete="on"

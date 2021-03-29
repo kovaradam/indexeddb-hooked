@@ -44,6 +44,11 @@ const config: Config = {
         return { ...data, id: (Math.random() * 100).toFixed(0) };
       }),
     },
+    {
+      name: 'fruits-obj-multiple-keypath-only',
+      options: { keyPath: ['name', 'taste'] },
+      data: objData,
+    },
   ],
   onOpenSuccess: () => console.log('DB is open and delicious'),
   _isDevelopment: true,
