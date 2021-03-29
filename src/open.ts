@@ -87,7 +87,7 @@ function upgradeStores(
     });
 
     if (!data) return;
-
+    objectStore.clear();
     writers.push((): void => {
       // Store values in the newly created objectStore.
       const dataObjectStore = db.transaction(name, 'readwrite').objectStore(name);

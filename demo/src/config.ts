@@ -8,7 +8,7 @@ const objData = [
 
 const config: Config = {
   name: 'FruitDB',
-  version: 1,
+  version: 3,
   objectStores: [
     {
       name: 'fruits',
