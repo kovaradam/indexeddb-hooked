@@ -13,7 +13,7 @@ function useUpdate(): Updater<void> {
     };
 
     const onComplete = (_: Event): void => {
-      if (renderOnUpdate) {
+      if (renderOnUpdate !== false) {
         Store.trigger(storeName);
       }
     };

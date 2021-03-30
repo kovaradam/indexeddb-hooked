@@ -51,3 +51,7 @@ class Store {
 }
 
 export default Store;
+
+export function subscribe(storeName: string, callback: () => void) {
+  return Store.subscribe(storeName, callback);
+}

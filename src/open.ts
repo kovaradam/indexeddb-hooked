@@ -114,3 +114,8 @@ function upgradeStores(
     };
   });
 }
+
+export function close(): void {
+  const db = Store.getDB();
+  db.close();
+}

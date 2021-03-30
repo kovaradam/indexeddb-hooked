@@ -78,22 +78,22 @@ interface ReadParams<T> extends BaseReadParams<T> {}
 function read<T extends DBRecord>(
   storeName: string,
   params: ReadParams<T> & { key: IDBValidKey; returnWithKey: true },
-): Promise<ResultWithKey<T>> | null;
+): Promise<ResultWithKey<T> | null>;
 
 function read<T extends DBRecord>(
   storeName: string,
   params: ReadParams<T> & { key: IDBValidKey },
-): Promise<T> | null;
+): Promise<T | null>;
 
 function read<T extends DBRecord>(
   storeName: string,
   params: ReadParams<T> & { returnWithKey: true },
-): Promise<ResultWithKey<T>[]> | null;
+): Promise<ResultWithKey<T>[] | null>;
 
 function read<T extends DBRecord>(
   storeName: string,
   params?: ReadParams<T>,
-): Promise<T[]> | null;
+): Promise<T[] | null>;
 
 function read<T>(storeName: string, params?: ReadParams<T>): Promise<ReadResult<T>> {
   const [promise, resolve, reject] = createPromiseWithOutsideResolvers<

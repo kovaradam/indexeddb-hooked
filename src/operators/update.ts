@@ -52,7 +52,7 @@ const update: Updater<Promise<null>> = (
     resolve(null);
   }
   function onError(event: Event): void {
-    reject(event.type);
+    reject((event.target as IDBRequest).error?.message || '');
   }
   asyncUpdate(storeName, { data, onComplete, onError });
   return promise;

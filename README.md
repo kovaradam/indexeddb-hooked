@@ -6,11 +6,11 @@ npm i indexeddb-hooked
 
 ### Initialize a DB
 
-You connect your React app with the `IndexedDBProvider` component and define your schema in a `config` object.
+You define your schema in a `config` object and establish a database connection via `open` function somewhere in your app.
 
 ```jsx
 import React from 'react';
-import { IndexedDBProvider } from 'indexeddb-hooked';
+import { open } from 'indexeddb-hooked';
 
 const config = {
   name: 'FruitDB',
@@ -30,11 +30,11 @@ const config = {
   onOpenSuccess: () => console.log('DB is open and delicious'),
 };
 
+open(config);
+
 const App = () => {
   return (
-    <IndexedDBProvider config={config}>
       <div>...</div>
-    </IndexedDBProvider>
   );
 };
 
@@ -168,4 +168,30 @@ Delete your data by specifying `key` and setting the `value` update parameter to
 | - | - | -: |
 | `unique?` | If true, the index will not allow duplicate values for a single key. | `boolean` |
 | `multiEntry?` | If `true`, the index will add an entry in the index for each array element when the `keyPath` resolves to an Array. If `false`, it will add one single entry containing the Array. | `boolean` |
+
+### Usage outside React components
+
+You can also use promise-based alternatives to `useRead` and `useUpdate` functions, like so:
+
+```ts
+import { read, update } from 'indexeddb-hooked';
+
+read('fruits').then(result => console.log(result));
+
+update('fruits', { value: 'pear' });
+```
+
+Be sure to use these functions after the database connection has been established. 
+
+#### Reacting to store changes
+
+In case you need to react to changes outside of React, you can subscribe listeners to specified store:
+
+```ts
+import { subscribe } from 'indexeddb-hooked';
+
+// returns function to unsubscribe the listener 
+const unsub = subscribe('fruits', () => console.log('juice!'));
+```
+
 
