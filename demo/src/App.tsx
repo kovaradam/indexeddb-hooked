@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
-import { useUpdate } from 'indexeddb-hooked';
 import AddFruit from './components/AddFruit';
 import FruitsBasket from './components/FruitsBasket';
 import Details from './components/Details';
+import { useUpdate } from 'indexeddb-hooked';
 
 function App() {
   return (

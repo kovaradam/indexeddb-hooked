@@ -1,4 +1,4 @@
-import { Config } from 'indexeddb-hooked';
+import { Config, read } from 'indexeddb-hooked';
 
 const objData = [
   { color: 'green', taste: 'sweet', name: 'apple' },
@@ -8,7 +8,7 @@ const objData = [
 
 const config: Config = {
   name: 'FruitDB',
-  version: 3,
+  version: 1,
   objectStores: [
     {
       name: 'fruits',
@@ -50,8 +50,12 @@ const config: Config = {
       data: objData,
     },
   ],
-  onOpenSuccess: () => console.log('DB is open and delicious'),
+  onOpenSuccess: onOpen,
   _isDevelopment: true,
 };
 
 export default config;
+
+function onOpen() {
+  read('fruits').then(console.log);
+}
