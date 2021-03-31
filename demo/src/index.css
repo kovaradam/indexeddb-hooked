@@ -22,6 +22,11 @@ ul {
   animation: alert 1s;
 }
 
+code:hover {
+  cursor: pointer;
+  font-weight: 600;
+}
+
 summary {
   color: pink;
 }

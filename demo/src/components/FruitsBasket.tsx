@@ -1,9 +1,12 @@
-import { DBRecord, ReadParams, useRead } from 'indexeddb-hooked';
+import { DBRecord, ReadParams, useRead, useUpdate } from 'indexeddb-hooked';
 
 type Props = { params?: ReadParams<DBRecord>; storeName?: string };
 
 const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
-  const fruits = useRead<DBRecord>(storeName || 'fruits', params);
+  const fruits = useRead<DBRecord>(storeName || 'fruits', {
+    ...params,
+    returnWithKey: true,
+  });
 
   if (!fruits) return <div>Loading</div>;
   /* Since IDB operations are asynchronous, useRead returns `null`
@@ -12,12 +15,27 @@ const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
   return (
     <ul>
       {fruits.length ? (
-        fruits.map((fruit) => <li>{JSON.stringify(fruit)}</li>)
+        fruits.map((fruit) => (
+          <ListItem key={'' + fruit.key} id={fruit.key} storeName={storeName}>
+            {fruit}
+          </ListItem>
+        ))
       ) : (
-        <li>{JSON.stringify(fruits)}</li>
+        <ListItem id={(fruits as any).key} storeName={storeName}>
+          {fruits}
+        </ListItem>
       )}
     </ul>
   );
 };
 
 export default FruitsBasket;
+
+const ListItem: React.FC<{ id: IDBValidKey } & Props> = ({ id, children, storeName }) => {
+  const update = useUpdate();
+  return (
+    <li onClick={() => update(storeName || 'fruits', { value: null, key: id })}>
+      <code>{JSON.stringify(children)}</code>
+    </li>
+  );
+};

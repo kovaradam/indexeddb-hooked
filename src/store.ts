@@ -1,7 +1,11 @@
+import { UpdateResult } from './model';
+
 type StoreSubscription = {
-  triggers: ((transactionCount: number) => void)[];
+  listeners: StoreListener[];
   transactionCount: number;
 };
+
+type StoreListener = (transactionCount: number, keys: UpdateResult) => void;
 
 class Store {
   private static db: IDBDatabase;
@@ -15,43 +19,44 @@ class Store {
 
   public static subscribe = (
     storeName: string,
-    trigger: (count: number) => void,
+    listener: StoreListener,
   ): (() => void) => {
     if (!Store.subscriptions[storeName]) {
-      Store.subscriptions[storeName] = { transactionCount: 0, triggers: [] };
+      Store.subscriptions[storeName] = { transactionCount: 0, listeners: [] };
     }
-    Store.subscriptions[storeName].triggers.push(trigger);
+    Store.subscriptions[storeName].listeners.push(listener);
 
     function unsubscribe() {
-      Store.subscriptions[storeName].triggers = Store.subscriptions[
+      Store.subscriptions[storeName].listeners = Store.subscriptions[
         storeName
-      ].triggers.filter((t) => t !== trigger);
+      ].listeners.filter((l) => l !== listener);
     }
 
     return unsubscribe;
   };
 
-  public static trigger = (storeName: string): void => {
-    const { triggers, transactionCount } = Store.subscriptions[storeName];
+  public static trigger = (storeName: string, keys: UpdateResult): void => {
+    const { listeners, transactionCount } = Store.subscriptions[storeName];
     Store.subscriptions[storeName].transactionCount = transactionCount + 1;
-    if (!triggers) {
+    if (!listeners) {
       return;
     }
-    triggers.forEach((trigger) =>
-      trigger(Store.subscriptions[storeName].transactionCount),
+    listeners.forEach((listener) =>
+      listener(Store.subscriptions[storeName].transactionCount, keys),
     );
   };
 
   public static wake = (): void => {
     const storeNames = Object.keys(Store.subscriptions);
     storeNames.forEach((storeName) => {
-      Store.trigger(storeName);
+      Store.trigger(storeName, []);
     });
   };
 }
 
 export default Store;
 
-export function subscribe(storeName: string, callback: () => void) {
-  return Store.subscribe(storeName, callback);
+export function subscribe(storeName: string, listener: (keys: UpdateResult) => void) {
+  const _listener = (_: number, keys: UpdateResult) => listener(keys);
+  return Store.subscribe(storeName, _listener);
 }

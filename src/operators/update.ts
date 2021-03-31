@@ -1,10 +1,10 @@
-import { DBRecord, UpdateData, Updater } from '../model';
+import { DBRecord, UpdateData, Updater, UpdateResult } from '../model';
 import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
 type AsyncUpdateParams = {
   data: UpdateData | UpdateData[];
-  onComplete: (event: Event) => void;
+  onComplete: (event: Event, keys: UpdateResult) => void;
   onError?: (event: Event) => void;
 };
 
@@ -23,33 +23,41 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
   transaction.onerror = (event: Event): void => {
     params.onError && params.onError(event);
   };
-
+  const returnKeys: IDBValidKey[] = [];
   transaction.oncomplete = (event: Event): void => {
-    onComplete(event);
+    const keys = returnKeys.length > 1 ? returnKeys : returnKeys[0];
+    onComplete(event, keys);
   };
   if ((data as UpdateData[]).length === undefined) {
     data = [data as UpdateData];
   }
   (data as UpdateData[]).forEach((item) => {
     if ((item as UpdateData).value !== null) {
-      put(item as PutUpdateData, objectStore);
+      put(item as PutUpdateData, objectStore, returnKeys);
     } else {
-      deleteItem(item as UpdateData, objectStore);
+      if (item.key === undefined) {
+        throw new Error(`Error: Can't delete item without providing its key!`);
+      }
+      objectStore.delete(item.key).onsuccess = (event) =>
+        returnKeys.push((event.target as IDBRequest).result);
     }
   });
 }
 
-const update: Updater<Promise<null>> = (
+const update: Updater<Promise<UpdateResult>> = (
   storeName: string,
   data: UpdateData | UpdateData[],
   renderOnUpdate = true,
 ) => {
-  const [promise, resolve, reject] = createPromiseWithOutsideResolvers<null, string>();
-  function onComplete(): void {
+  const [promise, resolve, reject] = createPromiseWithOutsideResolvers<
+    UpdateResult,
+    string
+  >();
+  function onComplete(_: Event, keys: UpdateResult): void {
     if (renderOnUpdate !== false) {
-      Store.trigger(storeName);
+      Store.trigger(storeName, keys);
     }
-    resolve(null);
+    resolve(keys);
   }
   function onError(event: Event): void {
     reject((event.target as IDBRequest).error?.message || '');
@@ -64,23 +72,33 @@ interface PutUpdateData extends UpdateData {
   value: DBRecord;
 }
 
-function put(data: PutUpdateData, objectStore: IDBObjectStore): void {
+function put(
+  data: PutUpdateData,
+  objectStore: IDBObjectStore,
+  returnKeys: IDBValidKey[],
+): void {
   const { value, key, replace } = data;
 
+  function _put(value: DBRecord, key?: IDBValidKey) {
+    objectStore.put(value, key).onsuccess = (event) =>
+      returnKeys.push((event.target as IDBRequest).result);
+  }
+
   if (!key) {
-    objectStore.put(value);
+    _put(value);
     return;
   }
   if (replace) {
     if (objectStore.keyPath !== null) {
-      objectStore.put(value);
+      _put(value);
     } else {
-      objectStore.put(value, key as IDBValidKey);
+      _put(value, key as IDBValidKey);
     }
     return;
   }
 
   const request = objectStore.get(key);
+
   request.onsuccess = (_: Event): void => {
     let DBObject = request.result;
     if (DBObject !== undefined && typeof DBObject === 'object') {
@@ -89,16 +107,9 @@ function put(data: PutUpdateData, objectStore: IDBObjectStore): void {
       DBObject = value;
     }
     if (objectStore.keyPath === null) {
-      objectStore.put(DBObject, key as IDBValidKey);
+      _put(DBObject, key as IDBValidKey);
     } else {
-      objectStore.put(DBObject);
+      _put(DBObject);
     }
   };
-}
-
-function deleteItem(data: UpdateData, objectStore: IDBObjectStore): void {
-  if (data.key === undefined) {
-    throw new Error(`Error: Can't delete item without providing its key!`);
-  }
-  objectStore.delete(data.key);
 }

@@ -1,5 +1,5 @@
 import { asyncUpdate } from '../operators/update';
-import { UpdateData, Updater } from '../model';
+import { UpdateData, Updater, UpdateResult } from '../model';
 import Store from '../store';
 
 function useUpdate(): Updater<void> {
@@ -12,9 +12,9 @@ function useUpdate(): Updater<void> {
       throw new Error((event.target as IDBRequest).error?.message || '');
     };
 
-    const onComplete = (_: Event): void => {
+    const onComplete = (_: Event, keys: UpdateResult): void => {
       if (renderOnUpdate !== false) {
-        Store.trigger(storeName);
+        Store.trigger(storeName, keys);
       }
     };
 
