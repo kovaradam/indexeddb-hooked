@@ -2,13 +2,16 @@ import { DBRecord, UpdateData, UpdateResult } from '../model';
 import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
-type AsyncUpdateParams = {
-  data: UpdateData | UpdateData[];
+type AsyncUpdateParams<T> = {
+  data: UpdateData<T> | UpdateData<T>[];
   onComplete: (event: Event, keys: UpdateResult) => void;
   onError?: (event: Event) => void;
 };
 
-export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void {
+export function asyncUpdate<T extends DBRecord>(
+  storeName: string,
+  params: AsyncUpdateParams<T>,
+): void {
   const { onComplete } = params;
   let { data } = params;
   const db = Store.getDB();
@@ -21,7 +24,7 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
   const objectStore = transaction.objectStore(storeName);
 
   const returnKeys: IDBValidKey[] = [];
-  const isDataArray = (data as UpdateData[]).length !== undefined;
+  const isDataArray = (data as UpdateData<T>[]).length !== undefined;
 
   transaction.onerror = (event: Event): void => {
     params.onError && params.onError(event);
@@ -33,11 +36,11 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
   };
 
   if (!isDataArray) {
-    data = [data as UpdateData];
+    data = [data as UpdateData<T>];
   }
-  (data as UpdateData[]).forEach((item) => {
-    if ((item as UpdateData).value !== null) {
-      put(item as PutUpdateData, objectStore, returnKeys);
+  (data as UpdateData<T>[]).forEach((item) => {
+    if ((item as UpdateData<T>).value !== null) {
+      put(item as PutUpdateData<T>, objectStore, returnKeys);
     } else {
       if (item.key === undefined) {
         throw new Error(`Error: Cannot delete item without providing its key!`);
@@ -48,15 +51,15 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
   });
 }
 
-function update(
+function update<T extends DBRecord>(
   storeName: string,
-  data: UpdateData[],
+  data: UpdateData<T>[],
   renderOnUpdate?: boolean,
 ): Promise<UpdateResult[]>;
 
-function update(
+function update<T extends DBRecord>(
   storeName: string,
-  data: UpdateData,
+  data: UpdateData<T>,
   renderOnUpdate?: boolean,
 ): Promise<IDBValidKey>;
 
@@ -80,18 +83,18 @@ function update(storeName: string, data: any, renderOnUpdate = true): Promise<un
 
 export default update;
 
-interface PutUpdateData extends UpdateData {
-  value: DBRecord;
+interface PutUpdateData<T> extends UpdateData<T> {
+  value: T;
 }
 
-function put(
-  data: PutUpdateData,
+function put<T extends DBRecord>(
+  data: PutUpdateData<T>,
   objectStore: IDBObjectStore,
   returnKeys: IDBValidKey[],
 ): void {
   const { value, key, replace } = data;
 
-  function _put(value: DBRecord, key?: IDBValidKey) {
+  function _put(value: T, key?: IDBValidKey) {
     objectStore.put(value, key).onsuccess = (event) =>
       returnKeys.push((event.target as IDBRequest).result);
   }
@@ -111,7 +114,7 @@ function put(
 
   const request = objectStore.get(key);
 
-  request.onsuccess = (_: Event): void => {
+  request.onsuccess = (): void => {
     let DBObject = request.result;
     if (DBObject !== undefined && typeof DBObject === 'object') {
       Object.assign(DBObject, value);

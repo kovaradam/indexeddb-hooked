@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useUpdate } from 'indexeddb-hooked';
 
 const AddFruit = () => {
-  const update = useUpdate();
+  const update = useUpdate<string>();
   const inputEl = useRef<HTMLInputElement | null>(null);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {

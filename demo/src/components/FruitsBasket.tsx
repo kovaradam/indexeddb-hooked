@@ -3,7 +3,7 @@ import { DBRecord, ReadParams, useRead, useUpdate } from 'indexeddb-hooked';
 type Props = { params?: ReadParams<DBRecord>; storeName?: string };
 
 const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
-  const fruits = useRead<DBRecord>(storeName || 'fruits', {
+  const fruits = useRead(storeName || 'fruits', {
     ...params,
     returnWithKey: true,
   });
@@ -32,7 +32,7 @@ const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
 export default FruitsBasket;
 
 const ListItem: React.FC<{ id: IDBValidKey } & Props> = ({ id, children, storeName }) => {
-  const update = useUpdate();
+  const update = useUpdate<string>();
   return (
     <li onClick={() => update(storeName || 'fruits', { value: null, key: id })}>
       <code>{JSON.stringify(children)}</code>

@@ -16,8 +16,8 @@ export type DBRecord =
   | RegExp[]
   | undefined[];
 
-export type UpdateData = {
-  value: DBRecord | null;
+export type UpdateData<T> = {
+  value: T | null;
   key?: IDBValidKey | IDBKeyRange;
   replace?: boolean;
 };
@@ -63,8 +63,8 @@ export type ReadResult<T> = T | ResultWithKey<T> | T[] | ResultWithKey<T>[] | nu
 
 export type UpdateResult = IDBValidKey | undefined;
 
-export type Updater<T> = (
+export type Updater<T extends DBRecord, U> = (
   storeName: string,
-  data: UpdateData | UpdateData[],
+  data: UpdateData<T> | UpdateData<T>[],
   renderOnUpdate?: boolean,
-) => T;
+) => U;

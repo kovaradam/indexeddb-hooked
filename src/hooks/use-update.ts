@@ -1,11 +1,11 @@
 import { asyncUpdate } from '../operators/update';
-import { UpdateData, Updater, UpdateResult } from '../model';
+import { DBRecord, UpdateData, Updater, UpdateResult } from '../model';
 import Store from '../store';
 
-function useUpdate(): Updater<void> {
+function useUpdate<T extends DBRecord>(): Updater<T, void> {
   function update(
     storeName: string,
-    data: UpdateData | UpdateData[],
+    data: UpdateData<T> | UpdateData<T>[],
     renderOnUpdate = true,
   ): void {
     const onError = (event: Event): void => {
