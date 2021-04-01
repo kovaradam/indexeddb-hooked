@@ -178,7 +178,8 @@ import { read, update } from 'indexeddb-hooked';
 
 read('fruits').then(result => console.log(result));
 
-update('fruits', { value: 'pear' });
+// result is key or key array of modified object(s)  
+update('fruits', { value: 'pear' }).then(result => console.log(result);
 ```
 
 Be sure to use these functions after the database connection has been established. 
@@ -191,7 +192,8 @@ In case you need to react to changes outside of React, you can subscribe listene
 import { subscribe } from 'indexeddb-hooked';
 
 // returns function to unsubscribe the listener 
-const unsub = subscribe('fruits', () => console.log('juice!'));
+// result is key or key array of modified object(s)  
+const unsub = subscribe('fruits', result => console.log(result));
 ```
 
 
