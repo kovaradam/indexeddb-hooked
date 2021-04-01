@@ -56,7 +56,10 @@ class Store {
 
 export default Store;
 
-export function subscribe(storeName: string, listener: (keys: UpdateResult) => void) {
+export function subscribe(
+  storeName: string,
+  listener: (keys: UpdateResult | UpdateResult[]) => void,
+) {
   const _listener = (_: number, keys: UpdateResult) => listener(keys);
   return Store.subscribe(storeName, _listener);
 }

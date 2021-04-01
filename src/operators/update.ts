@@ -1,4 +1,4 @@
-import { DBRecord, UpdateData, Updater, UpdateResult } from '../model';
+import { DBRecord, UpdateData, UpdateResult } from '../model';
 import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
@@ -20,15 +20,19 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
   const transaction = db.transaction(storeName, 'readwrite');
   const objectStore = transaction.objectStore(storeName);
 
+  const returnKeys: IDBValidKey[] = [];
+  const isDataArray = (data as UpdateData[]).length !== undefined;
+
   transaction.onerror = (event: Event): void => {
     params.onError && params.onError(event);
   };
-  const returnKeys: IDBValidKey[] = [];
+
   transaction.oncomplete = (event: Event): void => {
-    const keys = returnKeys.length > 1 ? returnKeys : returnKeys[0];
+    const keys = isDataArray ? returnKeys : returnKeys[0];
     onComplete(event, keys);
   };
-  if ((data as UpdateData[]).length === undefined) {
+
+  if (!isDataArray) {
     data = [data as UpdateData];
   }
   (data as UpdateData[]).forEach((item) => {
@@ -36,7 +40,7 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
       put(item as PutUpdateData, objectStore, returnKeys);
     } else {
       if (item.key === undefined) {
-        throw new Error(`Error: Can't delete item without providing its key!`);
+        throw new Error(`Error: Cannot delete item without providing its key!`);
       }
       objectStore.delete(item.key).onsuccess = (event) =>
         returnKeys.push((event.target as IDBRequest).result);
@@ -44,11 +48,19 @@ export function asyncUpdate(storeName: string, params: AsyncUpdateParams): void 
   });
 }
 
-const update: Updater<Promise<UpdateResult>> = (
+function update(
   storeName: string,
-  data: UpdateData | UpdateData[],
-  renderOnUpdate = true,
-) => {
+  data: UpdateData[],
+  renderOnUpdate?: boolean,
+): Promise<UpdateResult[]>;
+
+function update(
+  storeName: string,
+  data: UpdateData,
+  renderOnUpdate?: boolean,
+): Promise<IDBValidKey>;
+
+function update(storeName: string, data: any, renderOnUpdate = true): Promise<unknown> {
   const [promise, resolve, reject] = createPromiseWithOutsideResolvers<
     UpdateResult,
     string
@@ -64,7 +76,7 @@ const update: Updater<Promise<UpdateResult>> = (
   }
   asyncUpdate(storeName, { data, onComplete, onError });
   return promise;
-};
+}
 
 export default update;
 

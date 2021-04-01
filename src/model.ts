@@ -61,7 +61,7 @@ export type ResultWithKey<T> = { value: T; key: IDBValidKey };
 
 export type ReadResult<T> = T | ResultWithKey<T> | T[] | ResultWithKey<T>[] | null;
 
-export type UpdateResult = IDBValidKey | IDBValidKey[];
+export type UpdateResult = IDBValidKey | undefined;
 
 export type Updater<T> = (
   storeName: string,
