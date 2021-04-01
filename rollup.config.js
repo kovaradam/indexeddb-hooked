@@ -10,6 +10,13 @@ export default [
       { file: pkg.main, format: 'cjs' },
       { file: pkg.module, format: 'es' },
     ],
+    external: ['react'],
+    onwarn: function (warning) {
+      if (warning.code === 'THIS_IS_UNDEFINED') {
+        return;
+      }
+      console.warn(warning.message);
+    },
   },
   {
     input: `${tsconfig.compilerOptions.outDir}/index.js`,

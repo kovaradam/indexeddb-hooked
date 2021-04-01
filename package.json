@@ -10,12 +10,12 @@
   ],
   "scripts": {
     "prebuild": "rm -rf lib dist",
-    "build": "npm-run-all prebuild build:ts build:rollup",
     "build:ts": "tsc",
     "build:rollup": "rollup -c",
+    "build": "npm-run-all prebuild build:*",
     "dev:ts": "tsc -w",
     "dev:rollup": "rollup -c -w",
-    "dev": "npm-run-all --parallel dev:ts dev:rollup",
+    "dev": "npm-run-all --parallel dev:*",
     "test": "jest --watch"
   },
   "repository": {
