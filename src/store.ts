@@ -36,6 +36,9 @@ class Store {
   };
 
   public static trigger = (storeName: string, keys: UpdateResult): void => {
+    if (Store.subscriptions[storeName] === undefined) {
+      return;
+    }
     const { listeners, transactionCount } = Store.subscriptions[storeName];
     Store.subscriptions[storeName].transactionCount = transactionCount + 1;
     if (!listeners) {
