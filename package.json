@@ -15,7 +15,8 @@
     "build": "npm-run-all prebuild build:*",
     "dev:ts": "tsc -w",
     "dev:rollup": "rollup -c -w",
-    "dev": "npm-run-all --parallel dev:*",
+    "start": "npm-run-all --parallel dev:*",
+    "prepublish": "npm run build",
     "test": "jest --watch"
   },
   "repository": {

@@ -48,7 +48,7 @@ function useRead<T extends DBRecord>(
   useEffect(() => Store.subscribe(storeName, setTransactionCount), [storeName]);
 
   const persistedParams = useRef(params);
-  const isParamChange = !areParamsEqueal(persistedParams.current, params);
+  const isParamChange = !areParamsEqual(persistedParams.current, params);
 
   if (isParamChange) {
     persistedParams.current = params;
@@ -107,7 +107,7 @@ function onError(event: Event): void {
 }
 
 // WIP
-export function areParamsEqueal<T>(
+export function areParamsEqual<T>(
   a: UseReadParams<T> | null | undefined,
   b: UseReadParams<T> | null | undefined,
 ): boolean {
