@@ -49,6 +49,10 @@ const config: Config = {
       options: { keyPath: ['name', 'taste'] },
       data: objData,
     },
+    {
+      name: 'fruits-no-listener',
+      options: { autoIncrement: true },
+    },
   ],
   onOpenSuccess: onOpen,
   _isDevelopment: true,
