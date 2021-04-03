@@ -3,6 +3,7 @@ import AddFruit from './components/AddFruit';
 import FruitsBasket from './components/FruitsBasket';
 import Details from './components/Details';
 import Creator from './components/Creator';
+import CreatorJS from './components/CreatorJS';
 import { useUpdate } from 'indexeddb-hooked';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <FruitsObjKeyPathOnly />
       <FruitsObjMultipleKeyPathOnly />
       <Creator />
+      <CreatorJS />
     </div>
   );
 }
