@@ -1,12 +1,12 @@
-import read from './operators/read';
-import update from './operators/update';
+import read from './api/read';
+import update from './api/update';
 
-import useRead from './hooks/use-read';
-import useUpdate from './hooks/use-update';
+import useRead from './api/use-read';
+import useUpdate from './api/use-update';
 
-import open, { close } from './open';
+import open from './core/open';
 
-import { subscribe } from './store';
+import { subscribe, close } from './store';
 
 export { read, update, useRead, useUpdate, open, close, subscribe };
 

@@ -1,4 +1,4 @@
-import { asyncUpdate } from '../operators/update';
+import { asyncUpdate } from '../core/update';
 import { DBRecord, UpdateData, Updater, UpdateResult } from '../model';
 import Store from '../store';
 

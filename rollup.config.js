@@ -5,22 +5,23 @@ import tsConfig from './tsconfig.json';
 import typescript from '@rollup/plugin-typescript';
 
 const srcDir = 'src';
+const apiDir = `${srcDir}/api`;
 const tsOutDir = tsConfig.compilerOptions.outDir;
 
 const input = [
   `${srcDir}/index.ts`,
-  `${srcDir}/hooks/use-read.ts`,
-  `${srcDir}/hooks/use-update.ts`,
-  `${srcDir}/operators/read.ts`,
-  `${srcDir}/operators/update.ts`,
+  `${apiDir}/use-read.ts`,
+  `${apiDir}/use-update.ts`,
+  `${apiDir}/read.ts`,
+  `${apiDir}/update.ts`,
 ];
 
 function createCommonJSConfig(outDir) {
   return {
-    input,
-    output: [{ dir: outDir, format: 'cjs', exports: 'named' }],
+    input: input[0],
+    output: [{ file: pkg.main, format: 'cjs', exports: 'named' }],
     external: ['react'],
-    plugins: [typescript({ outDir })],
+    plugins: [typescript({ outDir, declaration: false })],
   };
 }
 
@@ -35,7 +36,7 @@ function createModuleConfig(outDir) {
     },
     output: [{ dir: outDir, format: 'es' }],
     external: ['react'],
-    plugins: [typescript({ outDir })],
+    plugins: [typescript({ outDir, declaration: false })],
   };
 }
 
@@ -50,7 +51,7 @@ function createDeclarationConfig() {
 }
 
 export default [
-  createCommonJSConfig('lib/cjs'),
-  createModuleConfig('lib/esm'),
+  createCommonJSConfig('lib'),
+  createModuleConfig('lib'),
   createDeclarationConfig(),
 ];

@@ -5,7 +5,7 @@ import {
   ReadResult,
   ResultWithKey,
 } from '../model';
-import { asyncRead } from '../operators/read';
+import { asyncRead } from '../core/read';
 import Store from '../store';
 import { compareStringifiedObjects } from '../utils';
 
@@ -88,11 +88,11 @@ function useRead<T extends DBRecord>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!Store.getDB()) return null;
-
   if (!isParamChange && !isOutsideTrigger) {
     return lastResult.value;
   }
+
+  if (!Store.getDB()) return null;
 
   if (Store._isDevelopment) {
     lastResult.value = null;

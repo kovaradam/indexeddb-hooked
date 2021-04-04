@@ -66,3 +66,8 @@ export function subscribe(
   const _listener = (_: number, keys: UpdateResult) => listener(keys);
   return Store.subscribe(storeName, _listener);
 }
+
+export function close(): void {
+  const db = Store.getDB();
+  db.close();
+}
