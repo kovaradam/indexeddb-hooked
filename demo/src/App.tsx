@@ -1,10 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import AddFruit from './components/AddFruit';
 import FruitsBasket from './components/FruitsBasket';
 import Details from './components/Details';
 import Creator from './components/Creator';
 import CreatorJS from './components/CreatorJS';
-import { useUpdate } from 'indexeddb-hooked';
+import { subscribe, useUpdate } from 'indexeddb-hooked';
 
 function App() {
   return (
@@ -163,6 +163,16 @@ const Fruits: React.FC = () => {
   const [filterValue, setFilterValue] = useState(4);
   const [direction, setDirection] = useState<IDBCursorDirection>('next');
   const filter = useCallback((value) => value.length === filterValue, [filterValue]);
+  const keyInputEl = useRef<HTMLInputElement>(null);
+  const storeName = 'fruits';
+  useEffect(() => {
+    const unsub = subscribe(storeName, (key) => {
+      if (!keyInputEl?.current) return;
+      keyInputEl.current.value = `update key: ${key}`;
+    });
+    return unsub;
+  }, []);
+
   return (
     <Details name={'fruits'}>
       <FruitsBasket params={{ direction: 'next' }} />
@@ -182,6 +192,7 @@ const Fruits: React.FC = () => {
           <option value="prevunique">prevunique</option>
         </select>
       </form>
+      <input ref={keyInputEl} disabled />
     </Details>
   );
 };

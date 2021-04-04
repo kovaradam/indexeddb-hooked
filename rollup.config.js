@@ -1,38 +1,56 @@
 /* eslint-disable import/no-anonymous-default-export */
 import dts from 'rollup-plugin-dts';
 import pkg from './package.json';
-import tsconfig from './tsconfig.json';
+import tsConfig from './tsconfig.json';
+import typescript from '@rollup/plugin-typescript';
 
-const tsOutDir = tsconfig.compilerOptions.outDir;
+const srcDir = 'src';
+const tsOutDir = tsConfig.compilerOptions.outDir;
 
-export default [
-  {
-    input: [
-      `${tsOutDir}/index.js`,
-      `${tsOutDir}/hooks/use-read.js`,
-      `${tsOutDir}/hooks/use-update.js`,
-      `${tsOutDir}/operators/read.js`,
-      `${tsOutDir}/operators/update.js`,
-    ],
-    output: [
-      // { file: pkg.main, format: 'cjs' },
-      // { file: pkg.module, format: 'es' },
-      { dir: 'lib/esm', format: 'es' },
-      { dir: 'lib/cjs', format: 'cjs', exports: 'named' },
-    ],
+const input = [
+  `${srcDir}/index.ts`,
+  `${srcDir}/hooks/use-read.ts`,
+  `${srcDir}/hooks/use-update.ts`,
+  `${srcDir}/operators/read.ts`,
+  `${srcDir}/operators/update.ts`,
+];
+
+function createCommonJSConfig(outDir) {
+  return {
+    input,
+    output: [{ dir: outDir, format: 'cjs', exports: 'named' }],
     external: ['react'],
+    plugins: [typescript({ outDir })],
+  };
+}
+
+function createModuleConfig(outDir) {
+  return {
+    input,
     onwarn: function (warning) {
       if (warning.code === 'THIS_IS_UNDEFINED') {
         return;
       }
       console.warn(warning.message);
     },
-  },
-  {
-    input: `${tsOutDir}/index.js`,
+    output: [{ dir: outDir, format: 'es' }],
+    external: ['react'],
+    plugins: [typescript({ outDir })],
+  };
+}
+
+function createDeclarationConfig() {
+  return {
+    input: `${tsOutDir}/index.d.ts`,
     output: {
       file: pkg.types,
     },
     plugins: [dts()],
-  },
+  };
+}
+
+export default [
+  createCommonJSConfig('lib/cjs'),
+  createModuleConfig('lib/esm'),
+  createDeclarationConfig(),
 ];
