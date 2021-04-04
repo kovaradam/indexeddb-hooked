@@ -49,6 +49,7 @@ function useRead<T extends DBRecord>(
 
   const persistedParams = useRef(params);
   const isParamChange = !areParamsEqual(persistedParams.current, params);
+  const isOutsideTrigger = transactionCount !== lastResult.transactionCount;
 
   if (isParamChange) {
     persistedParams.current = params;
@@ -74,13 +75,22 @@ function useRead<T extends DBRecord>(
     [lastResult.value, transactionCount],
   );
 
+  const read = useCallback(
+    () => asyncRead<T>(storeName, { ...params, onSuccess, onError }),
+    [params, onSuccess, storeName],
+  );
+
+  useEffect(() => {
+    // read on mount
+    if (Store.getDB()) {
+      read();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!Store.getDB()) return null;
 
-  if (
-    !isParamChange &&
-    lastResult.value &&
-    transactionCount === lastResult.transactionCount
-  ) {
+  if (!isParamChange && !isOutsideTrigger) {
     return lastResult.value;
   }
 
@@ -88,7 +98,7 @@ function useRead<T extends DBRecord>(
     lastResult.value = null;
   }
 
-  asyncRead<T>(storeName, { ...params, onSuccess, onError });
+  read();
 
   return lastResult.value;
 }
