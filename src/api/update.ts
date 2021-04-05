@@ -22,7 +22,7 @@ function update(storeName: string, data: any, renderOnUpdate = true): Promise<un
   >();
   function onComplete(_: Event, keys: UpdateResult): void {
     if (renderOnUpdate !== false) {
-      Store.trigger(storeName, keys);
+      Store.notify(storeName, keys);
     }
     resolve(keys);
   }
