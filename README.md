@@ -94,6 +94,34 @@ To specify request, you must provide a second argument in a form of an object. I
 | `filter?` | Filter function | `(value) => boolean` |
 | `returnWithKey?` | Data is returned with its key in a form of `{ value, key }` object | `boolean` |
 
+<details>
+  <summary>Example</summary>
+  
+  ```jsx
+import React from 'react';
+import { useRead } from 'indexeddb-hooked';
+
+const FruitsBasket = () => {
+  const fruits = useRead('fruits',{
+    returnWithKey: true,
+    keyRange: IDBKeyRange.bound(0, 2),
+    direction:'prev'
+  });
+
+  if (!fruits) return <div>Loading</div>;
+  
+  return (
+    <ul>
+      {fruits.map((result) => (
+        <li key={result.key}>{result.value}</li>
+      ))}
+    </ul>
+  );
+};
+  ```
+
+</details>
+
 ### Update your data
 
 All data manipulation is happening through `update` function returned from `useUpdate` hook:
