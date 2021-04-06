@@ -1,11 +1,5 @@
-import {
-  DBRecord,
-  ReadParams as BaseReadParams,
-  ReadResult,
-  ResultWithKey,
-} from '../model';
+import { ReadParams as BaseReadParams, ReadResult } from '../model';
 import Store from '../store';
-import { createPromiseWithOutsideResolvers } from '../utils';
 
 interface AsyncReadParams<T> extends BaseReadParams<T> {
   onSuccess: (result: ReadResult<T>, event: Event) => void;
@@ -72,45 +66,3 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
     return value;
   }
 }
-
-interface ReadParams<T> extends BaseReadParams<T> {}
-
-function read<T extends DBRecord>(
-  storeName: string,
-  params: ReadParams<T> & { key: IDBValidKey; returnWithKey: true },
-): Promise<ResultWithKey<T> | null>;
-
-function read<T extends DBRecord>(
-  storeName: string,
-  params: ReadParams<T> & { key: IDBValidKey },
-): Promise<T | null>;
-
-function read<T extends DBRecord>(
-  storeName: string,
-  params: ReadParams<T> & { returnWithKey: true },
-): Promise<ResultWithKey<T>[] | null>;
-
-function read<T extends DBRecord>(
-  storeName: string,
-  params?: ReadParams<T>,
-): Promise<T[] | null>;
-
-function read<T>(storeName: string, params?: ReadParams<T>): Promise<ReadResult<T>> {
-  const [promise, resolve, reject] = createPromiseWithOutsideResolvers<
-    ReadResult<T>,
-    string
-  >();
-
-  function onSuccess(result: ReadResult<T>, _: Event): void {
-    resolve(result);
-  }
-
-  function onError(event: Event): void {
-    reject(event.type);
-  }
-
-  asyncRead(storeName, { ...params, db: Store.getDB(), onSuccess, onError });
-  return promise;
-}
-
-export default read;

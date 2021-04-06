@@ -1,4 +1,4 @@
-import { asyncUpdate } from '../operators/update';
+import { asyncUpdate } from '../core/update';
 import { DBRecord, UpdateData, Updater, UpdateResult } from '../model';
 import Store from '../store';
 
@@ -14,7 +14,7 @@ function useUpdate<T extends DBRecord>(): Updater<T, void> {
 
     const onComplete = (_: Event, keys: UpdateResult): void => {
       if (renderOnUpdate !== false) {
-        Store.trigger(storeName, keys);
+        Store.notify(storeName, keys);
       }
     };
 

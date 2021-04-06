@@ -1,9 +1,9 @@
-import { Config, ObjectStoreParams } from './model';
-import Store from './store';
-import { createPromiseWithOutsideResolvers, usesInlineKeys } from './utils';
+import { Config, ObjectStoreParams } from '../model';
+import Store from '../store';
+import { createPromiseWithOutsideResolvers, usesInlineKeys } from '../utils';
 
 const open = (config: Config): Promise<IDBDatabase> => {
-  const name = config.name || 'indexeddb-hooked';
+  const name = config.name || 'IDB_HOOKED';
   const version = config.version || 1;
   const DBOpenRequest = window.indexedDB.open(name, version);
 
@@ -113,9 +113,4 @@ function upgradeStores(
       writers.forEach((write) => write());
     };
   });
-}
-
-export function close(): void {
-  const db = Store.getDB();
-  db.close();
 }

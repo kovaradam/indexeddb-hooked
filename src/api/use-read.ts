@@ -5,7 +5,7 @@ import {
   ReadResult,
   ResultWithKey,
 } from '../model';
-import { asyncRead } from '../operators/read';
+import { asyncRead } from '../core/read';
 import Store from '../store';
 import { compareStringifiedObjects } from '../utils';
 
@@ -49,6 +49,7 @@ function useRead<T extends DBRecord>(
 
   const persistedParams = useRef(params);
   const isParamChange = !areParamsEqual(persistedParams.current, params);
+  const isOutsideTrigger = transactionCount !== lastResult.transactionCount;
 
   if (isParamChange) {
     persistedParams.current = params;
@@ -74,21 +75,30 @@ function useRead<T extends DBRecord>(
     [lastResult.value, transactionCount],
   );
 
-  if (!Store.getDB()) return null;
+  const read = useCallback(
+    () => asyncRead<T>(storeName, { ...params, onSuccess, onError }),
+    [params, onSuccess, storeName],
+  );
 
-  if (
-    !isParamChange &&
-    lastResult.value &&
-    transactionCount === lastResult.transactionCount
-  ) {
+  useEffect(() => {
+    // read on mount
+    if (Store.getDB()) {
+      read();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!isParamChange && !isOutsideTrigger) {
     return lastResult.value;
   }
+
+  if (!Store.getDB()) return null;
 
   if (Store._isDevelopment) {
     lastResult.value = null;
   }
 
-  asyncRead<T>(storeName, { ...params, onSuccess, onError });
+  read();
 
   return lastResult.value;
 }

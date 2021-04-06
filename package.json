@@ -1,10 +1,11 @@
 {
   "name": "indexeddb-hooked",
-  "version": "0.3.1",
+  "version": "0.3.5",
   "description": "IndexedDB adapter for React",
-  "main": "lib/cjs/index.js",
-  "module": "lib/esm/index.js",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.js",
   "types": "lib/index.d.ts",
+  "sideEffects": false,
   "files": [
     "/lib"
   ],
@@ -12,11 +13,11 @@
     "prebuild": "rm -rf lib dist",
     "build:ts": "tsc",
     "build:rollup": "rollup -c",
-    "build": "npm-run-all prebuild build:*",
+    "build": "npm-run-all build:*",
     "dev:ts": "tsc -w",
     "dev:rollup": "rollup -c -w",
     "start": "npm-run-all --parallel dev:*",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "jest --watch"
   },
   "repository": {
@@ -38,6 +39,7 @@
     "@babel/preset-env": "^7.13.12",
     "@babel/preset-react": "^7.13.13",
     "@babel/preset-typescript": "^7.13.0",
+    "@rollup/plugin-typescript": "^8.2.1",
     "@types/jest": "^26.0.22",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.2",
@@ -61,6 +63,7 @@
     "prettier": "^2.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "rollup": "^2.44.0",
     "rollup-plugin-dts": "^3.0.1",
     "typescript": "^4.2.3"
   },

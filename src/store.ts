@@ -35,7 +35,7 @@ class Store {
     return unsubscribe;
   };
 
-  public static trigger = (storeName: string, keys?: UpdateResult): void => {
+  public static notify = (storeName: string, keys?: UpdateResult): void => {
     if (Store.subscriptions[storeName] === undefined) {
       return;
     }
@@ -52,7 +52,7 @@ class Store {
   public static wake = (): void => {
     const storeNames = Object.keys(Store.subscriptions);
     storeNames.forEach((storeName) => {
-      Store.trigger(storeName);
+      Store.notify(storeName);
     });
   };
 }
@@ -65,4 +65,9 @@ export function subscribe(
 ) {
   const _listener = (_: number, keys: UpdateResult) => listener(keys);
   return Store.subscribe(storeName, _listener);
+}
+
+export function close(): void {
+  const db = Store.getDB();
+  db.close();
 }
