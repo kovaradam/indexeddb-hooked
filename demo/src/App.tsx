@@ -196,45 +196,6 @@ const Fruits: React.FC = () => {
   );
 };
 
-const FruitsObjNoKey: React.FC = () => {
-  const [key, setKey] = useState<string>('apple');
-  const update = useUpdate();
-  const keyPath = 'name';
-  const [selector, setSelector] = useState(keyPath);
-  const [replace, setReplace] = useState(false);
-
-  return (
-    <Details name={'fruits-obj-nokey'}>
-      <FruitsBasket storeName="fruits-obj-nokey" params={{ returnWithKey: true }} />
-      <form onSubmit={(e) => e.preventDefault()}>
-        <input placeholder={'key = ' + key} onChange={(e) => setKey(e.target.value)} />
-        <input
-          placeholder={'selector = ' + selector}
-          onChange={(e) => setSelector(String(e.target.value))}
-          autoComplete="on"
-        />
-        <input
-          placeholder={'value'}
-          onChange={(e) => {
-            const value: Record<string, string> = {};
-            value[selector] = String(e.target.value);
-            // value[keyPath] = key;
-            update('fruits-obj-nokey', { value: value, key, replace });
-          }}
-          autoComplete="on"
-        />
-        <input
-          type="checkbox"
-          checked={replace}
-          onChange={() => setReplace((replace) => !replace)}
-          autoComplete="on"
-        />{' '}
-        Replace
-      </form>
-    </Details>
-  );
-};
-
 const FruitsObj: React.FC = () => {
   const [name, setName] = useState('apple');
   const [keyRange, setKeyRange] = useState({ lower: 2, upper: 3 });

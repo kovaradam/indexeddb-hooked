@@ -9,8 +9,9 @@ type StoreListener = (transactionCount: number, keys: UpdateResult) => void;
 
 class Store {
   private static db: IDBDatabase;
-  public static subscriptions: Record<string, StoreSubscription> = {};
+  private static subscriptions: Record<string, StoreSubscription> = {};
   public static _isDevelopment = false;
+
   public static setDB = (db: typeof Store.db): void => {
     Store.db = db;
   };
