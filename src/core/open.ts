@@ -1,6 +1,6 @@
 import { Config, ObjectStoreParams } from '../model';
 import Store from '../store';
-import { createPromiseWithOutsideResolvers, usesInlineKeys } from '../utils';
+import { createPromiseWithOutsideResolvers } from '../utils';
 
 const open = (config: Config): Promise<IDBDatabase> => {
   const name = config.name || 'IDB_HOOKED';
@@ -22,9 +22,7 @@ const open = (config: Config): Promise<IDBDatabase> => {
 
   DBOpenRequest.onsuccess = (event: Event): void => {
     const db = (event.target as IDBOpenDBRequest).result;
-    db.onerror = (event: Event): void => {
-      throw new Error((event.target as IDBRequest)?.error + '');
-    };
+    db.onerror = throwError;
     Store.setDB(db);
     Store.wake();
     promiseResolve(db);
@@ -71,7 +69,7 @@ function upgradeStores(
   let objectStore: IDBObjectStore;
   const writers: (() => void)[] = [];
 
-  params.forEach(({ name, options, indexes, data, dataKey }) => {
+  params.forEach(({ name, options, indexes, data }) => {
     if (db.objectStoreNames.contains(name)) {
       if (!transaction) return;
       objectStore = transaction.objectStore(name);
@@ -92,18 +90,7 @@ function upgradeStores(
       // Store values in the newly created objectStore.
       const dataObjectStore = db.transaction(name, 'readwrite').objectStore(name);
       data.forEach((item) => {
-        if (usesInlineKeys(dataObjectStore)) {
-          dataObjectStore.add(item);
-        } else {
-          if (!dataKey) {
-            throw new Error('Store uses out-of-line key and dataKey was not provided');
-          }
-          const itemKey = (item as { [key: string]: IDBValidKey })[dataKey];
-          if (!itemKey) {
-            throw new Error('DataKey does not exist on provided object');
-          }
-          dataObjectStore.add(item, itemKey);
-        }
+        dataObjectStore.add(item).onerror = throwError;
       });
     });
 
@@ -113,4 +100,8 @@ function upgradeStores(
       writers.forEach((write) => write());
     };
   });
+}
+
+function throwError(event: Event) {
+  throw new Error((event.target as IDBRequest)?.error + '');
 }

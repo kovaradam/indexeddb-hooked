@@ -8,7 +8,7 @@ const objData = [
 
 const config: Config = {
   name: 'FruitDB',
-  version: 2,
+  version: 1,
   objectStores: [
     {
       name: 'fruits',
@@ -27,11 +27,7 @@ const config: Config = {
       ],
       data: objData,
     },
-    {
-      name: 'fruits-obj-nokey',
-      data: objData,
-      dataKey: 'name',
-    },
+
     {
       name: 'fruits-obj-keygen-only',
       options: { autoIncrement: true },

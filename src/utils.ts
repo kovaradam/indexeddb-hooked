@@ -1,5 +1,5 @@
 type OutsideResolve<T> = (value: T) => void;
-type OutsideReject<T> = (reason: T) => void;
+type OutsideReject<T = string> = (reason: T) => void;
 
 export function createPromiseWithOutsideResolvers<Value, Reason>(): [
   Promise<Value>,

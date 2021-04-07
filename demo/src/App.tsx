@@ -11,7 +11,6 @@ function App() {
     <div className="App">
       <Fruits />
       <FruitsObj />
-      <FruitsObjNoKey />
       <FruitsObjKeyGenOnly />
       <FruitsObjKeyPathOnly />
       <FruitsObjMultipleKeyPathOnly />

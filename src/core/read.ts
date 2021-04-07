@@ -56,7 +56,7 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
   };
 
   function createResult<T>(value: T, key?: IDBValidKey): ReadResult<T> {
-    if (!value) {
+    if (value === null || value === undefined) {
       return null;
     }
 

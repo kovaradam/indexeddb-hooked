@@ -175,7 +175,7 @@ Delete your data by specifying `key` and setting the `value` update parameter to
 | `options?` | Specify [supply](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database) of your value keys by a [key path](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_keypath) or a [key generator](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_keygenerator) | [IDBObjectStoreParameters](#idbobjectstoreparameters) |
 | `indexes?` | Array containing parameters of indices to create on the database | [IndexParams[]](#indexparams) |
 | `data?` | Input data entries | `boolean[]`, `number[]`, `string[]`, `date[]`, `object[]`, `array[]`, `regexp[]`, `undefined[]`, `Blob[]`,`File[]` |
-| `dataKey?` | If `data` is provided and the store uses [out-of-line](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_outofline_key) keys, you must provide a name of the attribute, that will be used as a key when the data is inserted into the database | `string` |
+
 
 #### IDBObjectStoreParameters
  

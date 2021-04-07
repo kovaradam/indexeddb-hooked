@@ -42,7 +42,6 @@ export interface ObjectStoreParams {
   options?: IDBObjectStoreParameters;
   indexes?: IndexParams[];
   data?: DBRecord[];
-  dataKey?: string;
 }
 
 export type Config = {
