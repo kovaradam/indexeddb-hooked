@@ -6,10 +6,17 @@ const objData = [
   { color: 'yellow', taste: 'sour', name: 'lemon' },
 ];
 
+const keyPath = 'key';
+const store = {
+  name: 'test',
+  data: [{ [keyPath]: 1 }, { [keyPath]: 2 }],
+  options: { keyPath },
+};
 const config: Config = {
   name: 'FruitDB',
   version: 1,
   objectStores: [
+    store,
     {
       name: 'fruits',
       options: { autoIncrement: true },

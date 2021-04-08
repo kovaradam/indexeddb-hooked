@@ -16,8 +16,18 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
     throw new Error('Error: database is not open');
   }
 
-  const transaction = db.transaction(storeName, 'readonly');
-  const objectStore = transaction.objectStore(storeName);
+  let transaction, objectStore;
+  try {
+    transaction = db.transaction(storeName, 'readonly');
+    objectStore = transaction.objectStore(storeName);
+  } catch (error) {
+    if (params.onError) {
+      params.onError(error);
+    } else {
+      throw error;
+    }
+    return;
+  }
 
   if (!params) {
     const request = objectStore.getAll();

@@ -32,13 +32,14 @@ export function compareStringifiedObjects(
   a: ComparableObjectType,
   b: ComparableObjectType,
 ): boolean {
-  if (!a && !b) return true;
+  if (isFalsy(a)) return isFalsy(b);
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
 export function usesInlineKeys(objectStore: IDBObjectStore): boolean {
-  return (
-    (objectStore.keyPath !== undefined && objectStore.keyPath !== null) ||
-    objectStore.autoIncrement
-  );
+  return !isFalsy(objectStore.keyPath) || objectStore.autoIncrement;
+}
+
+function isFalsy(value: unknown): boolean {
+  return value === undefined || value === null;
 }

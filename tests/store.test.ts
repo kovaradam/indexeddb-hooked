@@ -2,16 +2,16 @@ import Store from '../src/store';
 
 it('subscribes store listener', () => {
   const storeName = 'test';
-  expect(Store.subscriptions[storeName]).toBe(undefined);
+  expect(Store['subscriptions'][storeName]).toBe(undefined);
   Store.subscribe(storeName, console.log);
-  expect(Store.subscriptions[storeName].listeners.length).toBe(1);
+  expect(Store['subscriptions'][storeName].listeners.length).toBe(1);
 });
 
 it('unbscribes store listener', () => {
   const storeName = 'test';
   const unsub = Store.subscribe(storeName, console.log);
   unsub();
-  expect(Store.subscriptions[storeName].listeners.length).toBe(0);
+  expect(Store['subscriptions'][storeName].listeners.length).toBe(0);
 });
 
 it('notifies all store listeners', () => {

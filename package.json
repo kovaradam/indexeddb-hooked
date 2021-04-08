@@ -18,7 +18,8 @@
     "dev:rollup": "rollup -c -w",
     "start": "npm-run-all --parallel dev:*",
     "prepublishOnly": "npm run build",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
