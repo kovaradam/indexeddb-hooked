@@ -9,13 +9,14 @@ import { subscribe, useUpdate } from 'indexeddb-hooked';
 function App() {
   return (
     <div className="App">
-      <Fruits />
+      {/* <Fruits />
       <FruitsObj />
       <FruitsObjKeyGenOnly />
       <FruitsObjKeyPathOnly />
       <FruitsObjMultipleKeyPathOnly />
       <Creator />
-      <CreatorJS />
+      <CreatorJS /> */}
+      <StoreNameInput />
     </div>
   );
 }
@@ -24,7 +25,7 @@ export default App;
 
 function FruitsObjKeyGenOnly() {
   const [key, setKey] = useState<number | string>(0);
-  const update = useUpdate();
+  const [update] = useUpdate();
   const [selector, setSelector] = useState('name');
   const [replace, setReplace] = useState(false);
 
@@ -59,7 +60,7 @@ function FruitsObjKeyGenOnly() {
 }
 function FruitsObjKeyPathOnly() {
   const [key, setKey] = useState<string>('0');
-  const update = useUpdate();
+  const [update] = useUpdate();
   const [selector, setSelector] = useState('name');
   const [replace, setReplace] = useState(false);
   const keyPath = 'id';
@@ -98,7 +99,7 @@ function FruitsObjKeyPathOnly() {
 }
 function FruitsObjMultipleKeyPathOnly() {
   const [keys, setKeys] = useState<[string, string]>(['apple', 'sweet']);
-  const update = useUpdate();
+  const [update] = useUpdate();
   const [selector, setSelector] = useState('name');
   const [replace, setReplace] = useState(false);
   const storeName = 'fruits-obj-multiple-keypath-only';
@@ -202,9 +203,10 @@ const FruitsObj: React.FC = () => {
   const [index, setIndex] = useState('by_name');
   const [selector, setSelector] = useState('name');
   const [key, setKey] = useState<number>(0);
-  const update = useUpdate();
+  const [update] = useUpdate();
   const [replace, setReplace] = useState(false);
   const keyPath = 'id';
+
   return (
     <Details name={'fruits-obj'}>
       <FruitsBasket storeName="fruits-obj" />
@@ -283,6 +285,16 @@ const FruitsObj: React.FC = () => {
           autoComplete="on"
         />
       </form>
+    </Details>
+  );
+};
+
+const StoreNameInput: React.FC = () => {
+  const [storeName, setStoreName] = useState('fruits');
+  return (
+    <Details name={storeName}>
+      <FruitsBasket storeName={storeName} />
+      <input onChange={(e) => setStoreName(e.target.value)} />
     </Details>
   );
 };

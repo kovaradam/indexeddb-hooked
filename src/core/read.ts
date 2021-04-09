@@ -16,26 +16,22 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
     throw new Error('Error: database is not open');
   }
 
-  let transaction, objectStore;
+  let transaction, objectStore, request: IDBRequest;
   try {
     transaction = db.transaction(storeName, 'readonly');
     objectStore = transaction.objectStore(storeName);
   } catch (error) {
-    if (params.onError) {
-      params.onError(error);
-    } else {
-      throw error;
-    }
+    onError(error);
     return;
   }
 
   if (!params) {
-    const request = objectStore.getAll();
+    request = objectStore.getAll();
     request.onsuccess = (event: Event): void => {
       onSuccess(request.result, event);
     };
   } else if (params?.key) {
-    const request = params.index
+    request = params.index
       ? objectStore.index(params.index).get(params.key)
       : objectStore.get(params.key);
     request.onsuccess = (event: Event): void => {
@@ -45,7 +41,7 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
     const result: ReadResult<T> = [];
     const keyRange = params.keyRange || null;
     const direction = params.direction || defaultDirection;
-    const request = objectStore.openCursor(keyRange, direction);
+    request = objectStore.openCursor(keyRange, direction);
     request.onsuccess = (event: Event): void => {
       const cursor = (event.target as IDBRequest)?.result;
       if (cursor) {
@@ -61,9 +57,14 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
     };
   }
 
-  transaction.onerror = (event: Event): void => {
-    params.onError && params.onError(event);
-  };
+  function onError(event: Event): void {
+    if (params.onError) {
+      params.onError(event);
+    }
+  }
+
+  transaction.onerror = onError;
+  request.onerror = onError;
 
   function createResult<T>(value: T, key?: IDBValidKey): ReadResult<T> {
     if (value === null || value === undefined) {

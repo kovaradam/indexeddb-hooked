@@ -60,6 +60,46 @@ it('updates item with inline key', (done) => {
   });
 });
 
+it('updates items with inline key', (done) => {
+  expect.assertions(1);
+  const newValue = 'new';
+  const store = stores[1];
+  const items = [...(store.data as any[])];
+  const updateValues = items.map((item) => ({ ...item, val: newValue }));
+  const onComplete = (_: Event, __: UpdateResult) => {
+    read(store.name).then((result) => {
+      expect(result).toStrictEqual(updateValues);
+      done();
+    });
+  };
+  asyncUpdate(store.name, {
+    data: updateValues.map((updateValue) => ({ value: updateValue })),
+    onComplete,
+  });
+});
+
+it('array update returns key array', (done) => {
+  expect.assertions(2);
+  function mapToKeys(item: any): any {
+    return item[keyPath];
+  }
+  const newValue = 'new';
+  const store = stores[1];
+  const items = [...(store.data as any[])];
+  const updateValues = items.map((item) => ({ ...item, val: newValue }));
+  const onComplete = (_: Event, keys: UpdateResult) => {
+    expect((keys as []).length).toBeDefined();
+    read(store.name).then((result) => {
+      expect(result.map(mapToKeys)).toStrictEqual(updateValues.map(mapToKeys));
+      done();
+    });
+  };
+  asyncUpdate(store.name, {
+    data: updateValues.map((updateValue) => ({ value: updateValue })),
+    onComplete,
+  });
+});
+
 it('updates item with out-of-line key', (done) => {
   expect.assertions(1);
   const store = stores[0];
@@ -103,6 +143,20 @@ it('return undefined key on delete item', (done) => {
   };
   asyncUpdate(store.name, {
     data: { value: null, key: item.key },
+    onComplete,
+  });
+});
+
+it('return array of undefined on array delete', (done) => {
+  expect.assertions(1);
+  const store = stores[1];
+  const items = store.data as any[];
+  const onComplete = (_: Event, keys: UpdateResult) => {
+    expect(keys).toStrictEqual(items.map(() => undefined));
+    done();
+  };
+  asyncUpdate(store.name, {
+    data: items.map((item) => ({ value: null, key: item.key })),
     onComplete,
   });
 });

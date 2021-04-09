@@ -1,26 +1,40 @@
+import { useCallback, useState } from 'react';
 import { asyncUpdate } from '../core/update';
 import { DBRecord, UpdateData, Updater, UpdateResult } from '../model';
-import Store from '../store';
 
-function useUpdate<T extends DBRecord>(): Updater<T, void> {
-  function update(
-    storeName: string,
-    data: UpdateData<T> | UpdateData<T>[],
-    renderOnUpdate = true,
-  ): void {
-    const onError = (event: Event): void => {
-      throw new Error((event.target as IDBRequest).error?.message || '');
-    };
+type UseUpdateReturnType<T extends DBRecord> = [
+  Updater<T, void>,
+  { result: UpdateResult | UpdateResult[]; error?: string },
+];
 
-    const onComplete = (_: Event, keys: UpdateResult): void => {
-      if (renderOnUpdate !== false) {
-        Store.notify(storeName, keys);
-      }
-    };
+function useUpdate<T extends DBRecord>(): UseUpdateReturnType<T> {
+  const [result, setResult] = useState<UpdateResult | UpdateResult[]>();
+  const [error, setError] = useState<string>();
 
-    asyncUpdate(storeName, { data, onComplete, onError });
-  }
-  return update;
+  const update = useCallback(
+    (
+      storeName: string,
+      data: UpdateData<T> | UpdateData<T>[],
+      renderOnUpdate = true,
+    ): void => {
+      const onError = (event: Event): void => {
+        setError(String(event));
+      };
+
+      const onComplete = (_: Event, keys: UpdateResult | UpdateResult[]): void =>
+        setResult(keys);
+
+      asyncUpdate(storeName, {
+        data,
+        onComplete,
+        onError,
+        renderOnUpdate,
+      });
+    },
+    [setError, setResult],
+  );
+
+  return [update, { result, error }];
 }
 
 export default useUpdate;

@@ -5,13 +5,14 @@ type AsyncUpdateParams<T> = {
   data: UpdateData<T> | UpdateData<T>[];
   onComplete: (event: Event, keys: UpdateResult) => void;
   onError?: (event: Event) => void;
+  renderOnUpdate?: boolean;
 };
 
 export function asyncUpdate<T extends DBRecord>(
   storeName: string,
   params: AsyncUpdateParams<T>,
 ): void {
-  const { onComplete } = params;
+  const { onComplete, renderOnUpdate } = params;
   let { data } = params;
   const db = Store.getDB();
 
@@ -19,18 +20,24 @@ export function asyncUpdate<T extends DBRecord>(
     throw new Error('Error: database is not open');
   }
 
-  const transaction = db.transaction(storeName, 'readwrite');
-  const objectStore = transaction.objectStore(storeName);
-
+  let transaction: IDBTransaction, objectStore: IDBObjectStore, request: IDBRequest;
+  try {
+    transaction = db.transaction(storeName, 'readwrite');
+    objectStore = transaction.objectStore(storeName);
+  } catch (error) {
+    onError(error);
+    return;
+  }
   const returnKeys: IDBValidKey[] = [];
   const isDataArray = (data as UpdateData<T>[]).length !== undefined;
 
-  transaction.onerror = (event: Event): void => {
-    params.onError && params.onError(event);
-  };
+  transaction.onerror = onError;
 
   transaction.oncomplete = (event: Event): void => {
     const keys = isDataArray ? returnKeys : returnKeys[0];
+    if (renderOnUpdate !== false) {
+      Store.notify(storeName, keys);
+    }
     onComplete(event, keys);
   };
 
@@ -39,15 +46,23 @@ export function asyncUpdate<T extends DBRecord>(
   }
   (data as UpdateData<T>[]).forEach((item) => {
     if ((item as UpdateData<T>).value !== null) {
-      put(item as PutUpdateData<T>, objectStore, returnKeys);
+      request = put(item as PutUpdateData<T>, objectStore, returnKeys);
     } else {
       if (item.key === undefined) {
-        throw new Error(`Error: Cannot delete item without providing its key!`);
+        onError('Error: Cannot delete item without providing its key!' as any);
+        return;
       }
-      objectStore.delete(item.key).onsuccess = (event) =>
-        returnKeys.push((event.target as IDBRequest).result);
+      request = objectStore.delete(item.key);
+      request.onsuccess = (event) => returnKeys.push((event.target as IDBRequest).result);
     }
+    request.onerror = onError;
   });
+
+  function onError(event: Event): void {
+    if (params.onError) {
+      params.onError(event);
+    }
+  }
 }
 
 interface PutUpdateData<T> extends UpdateData<T> {
@@ -58,25 +73,24 @@ function put<T extends DBRecord>(
   data: PutUpdateData<T>,
   objectStore: IDBObjectStore,
   returnKeys: IDBValidKey[],
-): void {
+): IDBRequest {
   const { value, key, replace } = data;
 
   function _put(value: T, key?: IDBValidKey) {
-    objectStore.put(value, key).onsuccess = (event) =>
-      returnKeys.push((event.target as IDBRequest).result);
+    const request = objectStore.put(value, key);
+    request.onsuccess = (event) => returnKeys.push((event.target as IDBRequest).result);
+    return request;
   }
 
   if (!key) {
-    _put(value);
-    return;
+    return _put(value);
   }
   if (replace) {
     if (objectStore.keyPath !== null) {
-      _put(value);
+      return _put(value);
     } else {
-      _put(value, key as IDBValidKey);
+      return _put(value, key as IDBValidKey);
     }
-    return;
   }
 
   const request = objectStore.get(key);
@@ -94,4 +108,6 @@ function put<T extends DBRecord>(
       _put(DBObject);
     }
   };
+
+  return request;
 }

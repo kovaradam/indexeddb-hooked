@@ -5,7 +5,10 @@ type StoreSubscription = {
   transactionCount: number;
 };
 
-type StoreListener = (transactionCount: number, keys: UpdateResult) => void;
+type StoreListener = (
+  transactionCount: number,
+  keys: UpdateResult | UpdateResult[],
+) => void;
 
 class Store {
   private static db: IDBDatabase;
@@ -36,7 +39,10 @@ class Store {
     return unsubscribe;
   };
 
-  public static notify = (storeName: string, keys?: UpdateResult): void => {
+  public static notify = (
+    storeName: string,
+    keys?: UpdateResult | UpdateResult[],
+  ): void => {
     if (Store.subscriptions[storeName] === undefined) {
       return;
     }
@@ -64,7 +70,7 @@ export function subscribe(
   storeName: string,
   listener: (keys: UpdateResult | UpdateResult[]) => void,
 ) {
-  const _listener = (_: number, keys: UpdateResult) => listener(keys);
+  const _listener = (_: number, keys: UpdateResult | UpdateResult[]) => listener(keys);
   return Store.subscribe(storeName, _listener);
 }
 

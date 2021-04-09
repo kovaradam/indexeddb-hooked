@@ -9,41 +9,47 @@ import { asyncRead } from '../core/read';
 import Store from '../store';
 import { compareStringifiedObjects } from '../utils';
 
+type ErrorObject = { message?: string };
+
 type ResultWithTransactionCount<T> = {
   value: ReadResult<T> | null;
   transactionCount: number;
 };
+
+type UseReadReturnType<T> = [T, string?];
 
 interface UseReadParams<T> extends BaseReadParams<T> {}
 
 function useRead<T extends DBRecord>(
   storeName: string,
   params: UseReadParams<T> & { key: IDBValidKey; returnWithKey: true },
-): ResultWithKey<T> | null;
+): UseReadReturnType<ResultWithKey<T> | null>;
 
 function useRead<T extends DBRecord>(
   storeName: string,
   params: UseReadParams<T> & { key: IDBValidKey },
-): T | null;
+): UseReadReturnType<T | null>;
 
 function useRead<T extends DBRecord>(
   storeName: string,
   params: UseReadParams<T> & { returnWithKey: true },
-): ResultWithKey<T>[] | null;
+): UseReadReturnType<ResultWithKey<T>[] | null>;
 
 function useRead<T extends DBRecord>(
   storeName: string,
   params?: UseReadParams<T>,
-): T[] | null;
+): UseReadReturnType<T[] | null>;
 
 function useRead<T extends DBRecord>(
   storeName: string,
   params?: UseReadParams<T>,
-): ReadResult<T> | null {
+): UseReadReturnType<ReadResult<T> | null> {
   const [transactionCount, setTransactionCount] = useState(-1);
   const [lastResult, setLastResult] = useState(
     createResultWithTransactionCount<T>(null, transactionCount),
   );
+
+  const error = useRef<ErrorObject>({});
 
   useEffect(() => Store.subscribe(storeName, setTransactionCount), [storeName]);
 
@@ -75,10 +81,21 @@ function useRead<T extends DBRecord>(
     [lastResult.value, transactionCount],
   );
 
-  const read = useCallback(
-    () => asyncRead<T>(storeName, { ...params, onSuccess, onError }),
-    [params, onSuccess, storeName],
+  const setErrorMessage = useCallback(
+    (value?: string): void => {
+      error.current.message = value;
+    },
+    [error],
   );
+
+  const read = useCallback(() => {
+    setErrorMessage();
+    asyncRead<T>(storeName, {
+      ...params,
+      onSuccess,
+      onError: (event: Event) => setErrorMessage(String(event)),
+    });
+  }, [params, onSuccess, storeName, setErrorMessage]);
 
   useEffect(() => {
     // read on mount
@@ -88,11 +105,19 @@ function useRead<T extends DBRecord>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const createResult = useCallback(
+    (value: ReadResult<T>): UseReadReturnType<ReadResult<T>> => [
+      value,
+      error.current.message,
+    ],
+    [error],
+  );
+
   if (!isParamChange && !isOutsideTrigger) {
-    return lastResult.value;
+    return createResult(lastResult.value);
   }
 
-  if (!Store.getDB()) return null;
+  if (!Store.getDB()) return createResult(null);
 
   if (Store._isDevelopment) {
     lastResult.value = null;
@@ -100,7 +125,7 @@ function useRead<T extends DBRecord>(
 
   read();
 
-  return lastResult.value;
+  return createResult(lastResult.value);
 }
 
 export default useRead;
@@ -110,10 +135,6 @@ function createResultWithTransactionCount<T>(
   transactionCount: number,
 ): ResultWithTransactionCount<T> {
   return { value, transactionCount };
-}
-
-function onError(event: Event): void {
-  throw new Error(event.type);
 }
 
 // WIP

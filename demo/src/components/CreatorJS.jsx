@@ -3,7 +3,7 @@ import { useUpdate } from 'indexeddb-hooked';
 import Details from './Details';
 
 const Creator = () => {
-  const update = useUpdate();
+  const [update] = useUpdate();
   const [storeName, setStoreName] = useState('fruits-no-listener');
   const textAreaEl = useRef(null);
 
