@@ -23,7 +23,7 @@ function update(storeName: string, data: any, renderOnUpdate = true): Promise<un
     resolve(keys);
   }
   function onError(event: Event): void {
-    reject((event.target as IDBRequest).error?.message || '');
+    reject(String(event));
   }
   asyncUpdate(storeName, { data, onComplete, onError, renderOnUpdate });
   return promise;

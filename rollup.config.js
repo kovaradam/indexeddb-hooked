@@ -3,18 +3,17 @@ import dts from 'rollup-plugin-dts';
 import pkg from './package.json';
 import tsConfig from './tsconfig.json';
 import typescript from '@rollup/plugin-typescript';
+import fs from 'fs';
 
 const srcDir = 'src';
 const apiDir = `${srcDir}/api`;
 const tsOutDir = tsConfig.compilerOptions.outDir;
 
-const input = [
-  `${srcDir}/index.ts`,
-  `${apiDir}/use-read.ts`,
-  `${apiDir}/use-update.ts`,
-  `${apiDir}/read.ts`,
-  `${apiDir}/update.ts`,
-];
+const input = [`${srcDir}/index.ts`];
+
+fs.readdirSync(apiDir).forEach((fileName) => {
+  input.push(`${apiDir}/${fileName}`);
+});
 
 function createCommonJSConfig(outDir) {
   return {

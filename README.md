@@ -181,7 +181,7 @@ Delete your data by specifying `key` and setting the `value` update parameter to
  
 |Value||Type|
 | - | - | -: |
-| `keyPath?` | Defines where the browser should extract the key from in the object store or index. If empty or not specified, the object store is created without a key path and uses [out-of-line](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_outofline_key) keys. | `string`,`string[]` |
+| `keyPath?` | Defines which value of input object is used as a key. If empty or not specified, the object store is created without a key path and uses [out-of-line](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_outofline_key) keys. | `string`,`string[]` |
 | `autoIncrement?` | If `true`, the object store has a [key generator](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB#gloss_keygenerator). Defaults to `false`. | `boolean` |
 
 #### IndexParams

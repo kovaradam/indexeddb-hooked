@@ -1,6 +1,7 @@
 import { open, read } from '../../src';
 import { asyncUpdate } from '../../src/core/update';
 import { Config, ObjectStoreParams, UpdateResult } from '../../src/model';
+import Store from '../../src/store';
 
 const keyPath = 'key';
 
@@ -57,6 +58,41 @@ it('updates item with inline key', (done) => {
   asyncUpdate(store.name, {
     data: { value: updateValue },
     onComplete,
+  });
+});
+
+it('notifies store on update', (done) => {
+  expect.assertions(1);
+  const newValue = 'new';
+  const store = stores[1];
+  const item = (store.data as any)[0];
+  const updateValue = { ...item, val: newValue };
+  Store.notify = jest.fn();
+  const onComplete = (_: Event, __: UpdateResult) => {
+    expect(Store.notify).toBeCalled();
+    done();
+  };
+  asyncUpdate(store.name, {
+    data: { value: updateValue },
+    onComplete,
+  });
+});
+
+it('does not notify store on update when renderOnUpdate is false', (done) => {
+  expect.assertions(1);
+  const newValue = 'new';
+  const store = stores[1];
+  const item = (store.data as any)[0];
+  const updateValue = { ...item, val: newValue };
+  Store.notify = jest.fn();
+  const onComplete = (_: Event, __: UpdateResult) => {
+    expect(Store.notify).toBeCalledTimes(0);
+    done();
+  };
+  asyncUpdate(store.name, {
+    data: { value: updateValue },
+    onComplete,
+    renderOnUpdate: false,
   });
 });
 
@@ -158,5 +194,35 @@ it('return array of undefined on array delete', (done) => {
   asyncUpdate(store.name, {
     data: items.map((item) => ({ value: null, key: item.key })),
     onComplete,
+  });
+});
+
+it('call onError with non-existent storeName', (done) => {
+  expect.assertions(1);
+  const onError = jest.fn();
+  const onComplete = (_: Event, __: UpdateResult) => {};
+  asyncUpdate('unknown', {
+    data: [],
+    onComplete,
+    onError: () => {
+      onError();
+      expect(onError).toBeCalled();
+      done();
+    },
+  });
+});
+
+it('call onError on delete w/o key', (done) => {
+  expect.assertions(1);
+  const onError = jest.fn();
+  const onComplete = (_: Event, __: UpdateResult) => {};
+  asyncUpdate(stores[0].name, {
+    data: { value: null },
+    onComplete,
+    onError: () => {
+      onError();
+      expect(onError).toBeCalled();
+      done();
+    },
   });
 });

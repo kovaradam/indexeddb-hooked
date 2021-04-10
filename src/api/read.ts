@@ -5,7 +5,6 @@ import {
   ReadResult,
   ResultWithKey,
 } from '../model';
-import Store from '../store';
 import { createPromiseWithOutsideResolvers } from '../utils';
 
 interface ReadParams<T> extends BaseReadParams<T> {}
@@ -41,10 +40,10 @@ function read<T>(storeName: string, params?: ReadParams<T>): Promise<ReadResult<
   }
 
   function onError(event: Event): void {
-    reject(event.type);
+    reject(String(event));
   }
 
-  asyncRead(storeName, { ...params, db: Store.getDB(), onSuccess, onError });
+  asyncRead(storeName, { ...params, onSuccess, onError });
   return promise;
 }
 
