@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { open, read } from 'indexeddb-hooked';
+import { open } from 'indexeddb-hooked';
 import config from './config';
 
-open(config).then(() => read('fruits').then(console.log));
+open(config);
 
 ReactDOM.render(
   <React.StrictMode>

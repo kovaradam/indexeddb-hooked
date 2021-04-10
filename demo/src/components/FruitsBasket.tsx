@@ -7,6 +7,7 @@ const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
     ...params,
     returnWithKey: true,
   });
+
   if (error) console.log('error:', error);
 
   if (!fruits) return <div>Loading</div>;

@@ -16,7 +16,7 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
     throw new Error('Error: database is not open');
   }
 
-  let transaction, objectStore, request: IDBRequest;
+  let transaction: IDBTransaction, objectStore: IDBObjectStore, request: IDBRequest;
   try {
     transaction = db.transaction(storeName, 'readonly');
     objectStore = transaction.objectStore(storeName);

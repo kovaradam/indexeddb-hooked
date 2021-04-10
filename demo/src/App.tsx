@@ -9,13 +9,13 @@ import { subscribe, useUpdate } from 'indexeddb-hooked';
 function App() {
   return (
     <div className="App">
-      {/* <Fruits />
+      <Fruits />
       <FruitsObj />
       <FruitsObjKeyGenOnly />
       <FruitsObjKeyPathOnly />
       <FruitsObjMultipleKeyPathOnly />
       <Creator />
-      <CreatorJS /> */}
+      <CreatorJS />
       <StoreNameInput />
     </div>
   );
