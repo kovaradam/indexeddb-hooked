@@ -44,6 +44,7 @@ function useRead<T extends DBRecord>(
   params?: UseReadParams<T>,
 ): UseReadReturnType<ReadResult<T> | null> {
   const [transactionCount, setTransactionCount] = useState(-1);
+  const [, setError] = useState<string>();
   const [lastResult, setLastResult] = useState<ReadResult<T> | null>(null);
   const persistedValues = useRef<PersistedValues<T>>({
     params,
@@ -71,6 +72,7 @@ function useRead<T extends DBRecord>(
   const setErrorMessage = useCallback(
     (value?: string): void => {
       persistedValues.current.error = value;
+      setError(value);
     },
     [persistedValues],
   );
