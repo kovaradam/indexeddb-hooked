@@ -52,7 +52,9 @@ function useRead<T extends DBRecord>(
     error: undefined,
   });
 
-  useEffect(() => Store.subscribe(storeName, setTransactionCount), [storeName]);
+  useEffect(() => {
+    return Store.subscribe(storeName, setTransactionCount);
+  }, [storeName]);
 
   const onSuccess = useCallback(
     (result: ReadResult<T>, _: Event) => {
@@ -74,7 +76,7 @@ function useRead<T extends DBRecord>(
       persistedValues.current.error = value;
       setError(value);
     },
-    [persistedValues],
+    [persistedValues, setError],
   );
 
   const read = useCallback(() => {
