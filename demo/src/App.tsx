@@ -290,7 +290,7 @@ const FruitsObj: React.FC = () => {
 };
 
 const StoreNameInput: React.FC = () => {
-  const [storeName, setStoreName] = useState('fruits');
+  const [storeName, setStoreName] = useState('fruiddts');
   return (
     <Details name={storeName}>
       <FruitsBasket storeName={storeName} />
