@@ -10,13 +10,14 @@ function App() {
   return (
     <div className="App">
       <Fruits />
-      <FruitsObj />
+      {/* <FruitsObj />
       <FruitsObjKeyGenOnly />
       <FruitsObjKeyPathOnly />
-      <FruitsObjMultipleKeyPathOnly />
+      <FruitsObjMultipleKeyPathOnly /> */}
+      {/* 
       <Creator />
-      <CreatorJS />
-      <StoreNameInput />
+      <CreatorJS /> */}
+      {/* <StoreNameInput /> */}
     </div>
   );
 }
@@ -290,7 +291,7 @@ const FruitsObj: React.FC = () => {
 };
 
 const StoreNameInput: React.FC = () => {
-  const [storeName, setStoreName] = useState('fruiddts');
+  const [storeName, setStoreName] = useState('fruits');
   return (
     <Details name={storeName}>
       <FruitsBasket storeName={storeName} />

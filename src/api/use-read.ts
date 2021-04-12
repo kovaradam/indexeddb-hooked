@@ -80,7 +80,7 @@ function useRead<T extends DBRecord>(
   );
 
   const read = useCallback(() => {
-    setErrorMessage();
+    persistedValues.current.error = undefined;
     asyncRead<T>(storeName, {
       ...params,
       onSuccess,
@@ -102,18 +102,18 @@ function useRead<T extends DBRecord>(
   persistedValues.current.params = params;
 
   const createResult = useCallback(
-    (value: ReadResult<T>): UseReadReturnType<ReadResult<T>> => [
+    (value: ReadResult<T>): UseReadReturnType<typeof value> => [
       value,
       persistedValues.current.error,
     ],
     [persistedValues],
   );
 
+  if (!Store.getDB()) return createResult(null);
+
   if (!isParamChange && !isOutsideTrigger) {
     return createResult(lastResult);
   }
-
-  if (!Store.getDB()) return createResult(null);
 
   read();
 

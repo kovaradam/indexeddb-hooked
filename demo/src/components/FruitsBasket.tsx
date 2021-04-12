@@ -10,7 +10,7 @@ const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
 
   if (error) console.log('error:', error);
 
-  if (!fruits) return <div>Loading</div>;
+  if (!fruits) return <div>null</div>;
   /* Since IDB operations are asynchronous, useRead returns `null`
      (or previous result) at first, then triggers render once the data is obtained.*/
 

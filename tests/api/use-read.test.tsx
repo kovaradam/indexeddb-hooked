@@ -13,7 +13,11 @@ import {
 import Store from '../../src/store';
 import { keyPath, keyPath2, sleep, stores } from '../utils';
 
-async function renderHook(storeName: string, params?: ReadParams, time = 10) {
+async function renderHook(
+  storeName: string,
+  params?: ReadParams,
+  time = 10,
+): Promise<{ current: ReturnType<typeof useRead> }> {
   let result = { current: null };
 
   function TestComponent() {
@@ -32,8 +36,8 @@ async function renderHook(storeName: string, params?: ReadParams, time = 10) {
 function createResult(
   result: ReadResult<DBRecord>,
   error?: string,
-): [ReadResult<DBRecord>, string?] {
-  return [result, error];
+): ReturnType<typeof useRead> {
+  return [result as any, error];
 }
 
 beforeAll((done) => {
@@ -57,12 +61,12 @@ afterEach(() => {
   container = null;
 });
 
-it('returns  null on mount', async (done) => {
+it('returns null and isLoading is true on mount', async (done) => {
   expect.assertions(1);
   const store = stores[0];
   await act(async () => {
     const result = await renderHook(store.name, undefined, 0);
-    expect(result.current).toStrictEqual(createResult(null));
+    expect(result.current).toStrictEqual(createResult(null, undefined, true));
     await sleep(10);
   });
   done();
