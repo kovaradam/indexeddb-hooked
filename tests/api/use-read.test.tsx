@@ -230,9 +230,13 @@ it('returns upper-key-bound items ', async (done) => {
   const store = stores[1];
   const [, upper] = [1, 3];
   expect.assertions(1);
-  const result = await renderHook(store.name, {
-    keyRange: IDBKeyRange.upperBound(upper),
-  });
+  const result = await renderHook(
+    store.name,
+    {
+      keyRange: IDBKeyRange.upperBound(upper),
+    },
+    20,
+  );
   expect(result.current).toStrictEqual(
     createResult((store.data as any[]).filter(({ key }) => key <= upper)),
   );
@@ -243,9 +247,13 @@ it('returns lower-key-bound items ', async (done) => {
   const store = stores[1];
   const [lower] = [1, 3];
   expect.assertions(1);
-  const result = await renderHook(store.name, {
-    keyRange: IDBKeyRange.lowerBound(lower),
-  });
+  const result = await renderHook(
+    store.name,
+    {
+      keyRange: IDBKeyRange.lowerBound(lower),
+    },
+    20,
+  );
   expect(result.current).toStrictEqual(
     createResult((store.data as any[]).filter(({ key }) => key >= lower)),
   );
