@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { asyncUpdate } from '../core/update';
 import { DBRecord, UpdateData, Updater, UpdateResult } from '../model';
+import { useStateUpdater } from '../utils';
 
 type UseUpdateReturnType<T extends DBRecord> = [
   Updater<T, void>,
@@ -8,8 +9,22 @@ type UseUpdateReturnType<T extends DBRecord> = [
 ];
 
 function useUpdate<T extends DBRecord>(): UseUpdateReturnType<T> {
-  const [result, setResult] = useState<UpdateResult | UpdateResult[]>();
-  const [error, setError] = useState<string>();
+  const error = useRef<string>();
+  const result = useRef<UpdateResult | UpdateResult[]>();
+  const forceUpdate = useStateUpdater();
+  const setError = useCallback(
+    (value: string | undefined) => {
+      error.current = value;
+    },
+    [error],
+  );
+
+  const setResult = useCallback(
+    (value: typeof result.current) => {
+      result.current = value;
+    },
+    [result],
+  );
 
   const update = useCallback(
     (
@@ -17,12 +32,16 @@ function useUpdate<T extends DBRecord>(): UseUpdateReturnType<T> {
       data: UpdateData<T> | UpdateData<T>[],
       renderOnUpdate = true,
     ): void => {
+      setError(undefined);
       const onError = (event: Event): void => {
         setError(String(event));
+        forceUpdate();
       };
 
-      const onComplete = (_: Event, keys: UpdateResult | UpdateResult[]): void =>
+      const onComplete = (_: Event, keys: typeof result.current): void => {
         setResult(keys);
+        forceUpdate();
+      };
 
       asyncUpdate(storeName, {
         data,
@@ -31,10 +50,10 @@ function useUpdate<T extends DBRecord>(): UseUpdateReturnType<T> {
         renderOnUpdate,
       });
     },
-    [setError, setResult],
+    [setError, setResult, forceUpdate],
   );
 
-  return [update, { result, error }];
+  return [update, { result: result.current, error: error.current }];
 }
 
 export default useUpdate;

@@ -8,7 +8,7 @@ const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
     returnWithKey: true,
   });
 
-  if (error) console.log('error:', error);
+  if (error) return <div>{error}</div>;
 
   if (isLoading) return <div>Loading</div>;
   if (!fruits) return <div>Null</div>;
@@ -37,7 +37,7 @@ export default FruitsBasket;
 const ListItem: React.FC<{ id: IDBValidKey } & Props> = ({ id, children, storeName }) => {
   const [update, { error }] = useUpdate<string>();
 
-  if (error) console.log(error);
+  if (error) console.log('update error:', error);
 
   return (
     <li onClick={() => update(storeName || 'fruits', { value: null, key: id })}>

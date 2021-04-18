@@ -1,10 +1,9 @@
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import { Config, DBRecord, open, UpdateData, useRead, useUpdate } from '../../src';
-import { areParamsEqual } from '../../src/api/use-read';
+import { Config, open, useUpdate } from '../../src';
 import Store from '../../src/store';
-import { keyPath, keyPath2, sleep, stores } from '../utils';
+import { keyPath, sleep, stores } from '../utils';
 
 async function renderHook(time = 10): Promise<{ current: ReturnType<typeof useUpdate> }> {
   let result = { current: null };
@@ -96,6 +95,23 @@ it('sets error on invalid operation', async (done) => {
     update(store.name, { value: null });
     await sleep(10);
     expect(result.current[1].error).toBeTruthy();
+  });
+  done();
+});
+
+it('sets undefined error on valid operation after invalid one', async (done) => {
+  expect.assertions(2);
+  const store = stores[0];
+  await act(async () => {
+    const result = await renderHook(10);
+    const [update] = result.current;
+    update(store.name, { value: null });
+    await sleep(10);
+    expect(result.current[1].error).toBeTruthy();
+    update(store.name, { value: null, key: 0 });
+    await sleep(10);
+    expect(result.current[1].error).toBe(undefined);
+    await sleep(10);
   });
   done();
 });

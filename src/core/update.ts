@@ -50,7 +50,10 @@ export function asyncUpdate<T extends DBRecord>(
       request = put(item as PutUpdateData<T>, objectStore, returnKeys);
     } else {
       if (item.key === undefined) {
-        onError('Error: Cannot delete item without providing its key!' as any);
+        transaction.abort();
+        onError(
+          'Error: Cannot delete item without providing its key! Aborting transaction' as any,
+        );
         return;
       }
       request = objectStore.delete(item.key);

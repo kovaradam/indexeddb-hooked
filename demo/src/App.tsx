@@ -17,7 +17,8 @@ function App() {
       <Creator />
       <CreatorJS />
 
-      <StoreNameInput /> */}
+    */}
+      <StoreNameInput />
     </div>
   );
 }
