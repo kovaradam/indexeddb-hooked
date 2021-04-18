@@ -20,7 +20,7 @@ export function asyncUpdate<T extends DBRecord>(
     throw new Error('Error: database is not open');
   }
 
-  let transaction: IDBTransaction, objectStore: IDBObjectStore, request: IDBRequest;
+  let transaction: IDBTransaction, objectStore: IDBObjectStore;
   try {
     transaction = db.transaction(storeName, 'readwrite');
     objectStore = transaction.objectStore(storeName);
@@ -45,6 +45,7 @@ export function asyncUpdate<T extends DBRecord>(
     data = [data as UpdateData<T>];
   }
   (data as UpdateData<T>[]).forEach((item) => {
+    let request: IDBRequest;
     if ((item as UpdateData<T>).value !== null) {
       request = put(item as PutUpdateData<T>, objectStore, returnKeys);
     } else {
