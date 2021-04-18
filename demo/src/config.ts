@@ -66,6 +66,6 @@ export default config;
 function onOpen() {
   read('fruits').then(console.log);
   subscribe('fruits', (result) => console.log(result));
-  update('fruits', [{ value: 'pear' }]);
-  update('fruits', { value: 'apple' });
+  // update('fruits', [{ value: 'pear' }]);
+  // update('fruits', { value: 'apple' });
 }

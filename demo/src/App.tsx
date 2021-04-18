@@ -10,13 +10,14 @@ function App() {
   return (
     <div className="App">
       <Fruits />
-      <FruitsObj />
+      {/* <FruitsObj />
       <FruitsObjKeyGenOnly />
       <FruitsObjKeyPathOnly />
-      <FruitsObjMultipleKeyPathOnly />
+      <FruitsObjMultipleKeyPathOnly /> */}
+      {/* 
       <Creator />
-      <CreatorJS />
-      <StoreNameInput />
+      <CreatorJS /> */}
+      {/* <StoreNameInput /> */}
     </div>
   );
 }
