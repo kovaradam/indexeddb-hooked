@@ -36,9 +36,10 @@ async function renderHook(
 
 function createResult(
   result: ReadResult<DBRecord>,
+  isLoading = false,
   error?: string,
 ): ReturnType<typeof useRead> {
-  return [result as any, error];
+  return [result as any, { error, isLoading }];
 }
 
 beforeAll((done) => {
@@ -67,7 +68,7 @@ it('returns null and isLoading is true on mount', async (done) => {
   const store = stores[0];
   await act(async () => {
     const result = await renderHook(store.name, undefined, 0);
-    expect(result.current).toStrictEqual(createResult(null, undefined));
+    expect(result.current).toStrictEqual(createResult(null, true));
     await sleep(10);
   });
   done();
@@ -96,8 +97,8 @@ it('unsubscribes listener after unmount', async (done) => {
 
 it('returns store data', async (done) => {
   expect.assertions(1);
-  const store = stores[1];
-  const result = await renderHook(store.name);
+  const store = stores[0];
+  const result = await renderHook(store.name, {}, 200);
   expect(result.current).toStrictEqual(createResult(store.data));
   done();
 });
@@ -123,9 +124,9 @@ it('returns new store data on update', async (done) => {
 it('returns new store data on param change', async (done) => {
   expect.assertions(2);
   const store = stores[0];
-  let result = await renderHook(store.name);
+  let result = await renderHook(store.name, {}, 200);
   expect(result.current).toStrictEqual(createResult(store.data));
-  result = await renderHook(store.name, { direction: 'prev' });
+  result = await renderHook(store.name, { direction: 'prev' }, 200);
   expect(result.current).toStrictEqual(createResult([...store.data].reverse()));
   done();
 });
@@ -133,7 +134,8 @@ it('returns new store data on param change', async (done) => {
 it('errors on unknown store', async (done) => {
   expect.assertions(1);
   const result = await renderHook('unknown');
-  expect(result.current[1]).toBeTruthy();
+  const { error } = result.current[1];
+  expect(error).toBeTruthy();
   done();
 });
 
@@ -190,10 +192,14 @@ it('returns one item by multiple keys', async (done) => {
 it('returns null on non-existent key', async (done) => {
   const store = stores[1];
   expect.assertions(1);
-  const result = await renderHook(store.name, {
-    direction: 'prev',
-    key: 'unknown',
-  });
+  const result = await renderHook(
+    store.name,
+    {
+      direction: 'prev',
+      key: 'unknown',
+    },
+    200,
+  );
   expect(result.current).toStrictEqual(createResult(null));
   done();
 });

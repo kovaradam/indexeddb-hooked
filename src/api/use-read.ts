@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {
   ReadParams as BaseReadParams,
   DBRecord,
@@ -16,6 +16,8 @@ type PersistedValues<T> = {
   params?: UseReadParams<T>;
   transactionCount: number;
   error?: string;
+  isLoading: boolean;
+  prevResult: ReadResult<T> | null;
 };
 
 function useRead<T extends DBRecord>(
@@ -43,46 +45,67 @@ function useRead<T extends DBRecord>(
   params?: UseReadParams<T>,
 ): UseReadReturnType<ReadResult<T> | null> {
   const [transactionCount, setTransactionCount] = useState(-1);
-  const [, setIsLoading] = useState(false);
-  const [lastResult, setLastResult] = useState<ReadResult<T> | null>(null);
-  const persistedValues = useRef<PersistedValues<T>>({
+  const [, forceUpdate] = useReducer((p) => !p, false);
+  const persisted = useRef<PersistedValues<T>>({
     params,
     transactionCount,
     error: undefined,
+    isLoading: true,
+    prevResult: null,
   });
 
   useEffect(() => {
     return Store.subscribe(storeName, setTransactionCount);
   }, [storeName]);
 
-  const onSuccess = useCallback(
-    (result: ReadResult<T>, _: Event) => setLastResult(result),
-    [setLastResult],
-  );
-
   const setErrorMessage = useCallback(
     (value?: string): void => {
-      persistedValues.current.error = value;
+      persisted.current.error = value;
     },
-    [persistedValues],
+    [persisted],
+  );
+
+  const setIsLoading = useCallback(
+    (isLoading: boolean): void => {
+      persisted.current.isLoading = isLoading;
+    },
+    [persisted],
+  );
+
+  const setPrevResult = useCallback(
+    (result: ReadResult<T>): void => {
+      persisted.current.prevResult = result;
+    },
+    [persisted],
+  );
+
+  const onSuccess = useCallback(
+    (result: ReadResult<T>, _: Event) => {
+      setIsLoading(false);
+      setPrevResult(result);
+      forceUpdate();
+    },
+    [setPrevResult, setIsLoading, forceUpdate],
   );
 
   const onError = useCallback(
     (event: Event) => {
       setErrorMessage(String(event));
       setIsLoading(false);
+      forceUpdate();
     },
-    [setErrorMessage, setIsLoading],
+    [setErrorMessage, setIsLoading, forceUpdate],
   );
 
   const read = useCallback(() => {
     setErrorMessage();
+    setIsLoading(true);
     asyncRead<T>(storeName, {
       ...params,
       onSuccess,
       onError,
     });
-  }, [params, onSuccess, storeName, setErrorMessage, onError]);
+  }, [params, onSuccess, storeName, setErrorMessage, onError, setIsLoading]);
 
   useEffect(() => {
     // read on mount
@@ -93,30 +116,30 @@ function useRead<T extends DBRecord>(
   }, []);
 
   const createResult = useCallback(
-    (value: ReadResult<T>, isLoading = true): UseReadReturnType<ReadResult<T>> => [
-      value,
-      { error: persistedValues.current.error, isLoading },
+    (value?: ReadResult<T>): UseReadReturnType<ReadResult<T>> => [
+      value !== undefined ? value : persisted.current.prevResult,
+      {
+        error: persisted.current.error,
+        isLoading: persisted.current.isLoading,
+      },
     ],
-    [persistedValues],
+    [persisted],
   );
 
-  const isParamChange = !areParamsEqual(persistedValues.current.params, params);
-  const isOutsideTrigger = transactionCount !== persistedValues.current.transactionCount;
-  persistedValues.current.transactionCount = transactionCount;
-  persistedValues.current.params = params;
+  const isParamChange = !areParamsEqual(persisted.current.params, params);
+  const isOutsideTrigger = transactionCount !== persisted.current.transactionCount;
+  persisted.current.transactionCount = transactionCount;
+  persisted.current.params = params;
 
   if (!Store.getDB()) return createResult(null);
 
   if (!isParamChange && !isOutsideTrigger) {
-    return createResult(lastResult, false);
+    return createResult();
   }
 
   read();
 
-  if (Store._isDevelopment) {
-    return createResult(null);
-  }
-  return createResult(lastResult);
+  return createResult();
 }
 
 export default useRead;
