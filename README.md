@@ -64,11 +64,14 @@ import React from 'react';
 import { useRead } from 'indexeddb-hooked';
 
 const FruitsBasket = () => {
-  const fruits = useRead('fruits');
-
-  if (!fruits) return <div>Loading</div>;
+  const [fruits, { isLoading, error }] = useRead('fruits');
   /* Since IDB operations are asynchronous, useRead returns `null`
    (or previous result) at first, then triggers render once the data is obtained.*/
+
+  if (isLoading) return <div>Loading</div>;
+  /* You can use isLoading boolean flag and error string 
+   to reflect transaction state */
+  if (error) return <div>{error}</div>;
 
   return (
     <ul>
@@ -131,8 +134,12 @@ import React from 'react';
 import { useUpdate } from 'indexeddb-hooked';
 
 const AddFruit = () => {
-  const update = useUpdate();
+  const [update, { result, error }] = useUpdate();
   const inputEl = useRef(null);
+
+  if (error) console.log(error);
+
+  if (result) console.log(`Added fruit with key ${result}`);
 
   const onSubmit = (e) => {
     e.preventDefault();

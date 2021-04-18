@@ -35,7 +35,7 @@ const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
 export default FruitsBasket;
 
 const ListItem: React.FC<{ id: IDBValidKey } & Props> = ({ id, children, storeName }) => {
-  const [update, { error }] = useUpdate<string>();
+  const [update, { error, result }] = useUpdate<string>();
 
   if (error) console.log('update error:', error);
 
