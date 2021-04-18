@@ -7,7 +7,6 @@ import {
 } from '../model';
 import { asyncRead } from '../core/read';
 import Store from '../store';
-import { compareStringifiedObjects } from '../utils';
 
 type UseReadReturnType<T> = [T, { error?: string; isLoading: boolean }];
 
