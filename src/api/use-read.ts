@@ -9,7 +9,7 @@ import { asyncRead } from '../core/read';
 import Store from '../store';
 import { compareStringifiedObjects } from '../utils';
 
-type UseReadReturnType<T> = [T, string?];
+type UseReadReturnType<T> = [T, { error?: string; isLoading: boolean }];
 
 interface UseReadParams<T> extends BaseReadParams<T> {}
 
@@ -44,7 +44,7 @@ function useRead<T extends DBRecord>(
   params?: UseReadParams<T>,
 ): UseReadReturnType<ReadResult<T> | null> {
   const [transactionCount, setTransactionCount] = useState(-1);
-  const [, setError] = useState<string>();
+  const [, setIsLoading] = useState(false);
   const [lastResult, setLastResult] = useState<ReadResult<T> | null>(null);
   const persistedValues = useRef<PersistedValues<T>>({
     params,
@@ -57,26 +57,23 @@ function useRead<T extends DBRecord>(
   }, [storeName]);
 
   const onSuccess = useCallback(
-    (result: ReadResult<T>, _: Event) => {
-      const compare =
-        typeof result === 'object'
-          ? compareStringifiedObjects
-          : (a: unknown, b: unknown): boolean => a === b;
-      if (
-        !compare(result as Record<string, unknown>, lastResult as Record<string, unknown>)
-      ) {
-        setLastResult(result);
-      }
-    },
-    [lastResult],
+    (result: ReadResult<T>, _: Event) => setLastResult(result),
+    [setLastResult],
   );
 
   const setErrorMessage = useCallback(
     (value?: string): void => {
       persistedValues.current.error = value;
-      setError(value);
     },
-    [persistedValues, setError],
+    [persistedValues],
+  );
+
+  const onError = useCallback(
+    (event: Event) => {
+      setErrorMessage(String(event));
+      setIsLoading(false);
+    },
+    [setErrorMessage, setIsLoading],
   );
 
   const read = useCallback(() => {
@@ -84,9 +81,9 @@ function useRead<T extends DBRecord>(
     asyncRead<T>(storeName, {
       ...params,
       onSuccess,
-      onError: (event: Event) => setErrorMessage(String(event)),
+      onError,
     });
-  }, [params, onSuccess, storeName, setErrorMessage]);
+  }, [params, onSuccess, storeName, setErrorMessage, onError]);
 
   useEffect(() => {
     // read on mount
@@ -96,24 +93,24 @@ function useRead<T extends DBRecord>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const createResult = useCallback(
+    (value: ReadResult<T>, isLoading = true): UseReadReturnType<ReadResult<T>> => [
+      value,
+      { error: persistedValues.current.error, isLoading },
+    ],
+    [persistedValues],
+  );
+
   const isParamChange = !areParamsEqual(persistedValues.current.params, params);
   const isOutsideTrigger = transactionCount !== persistedValues.current.transactionCount;
   persistedValues.current.transactionCount = transactionCount;
   persistedValues.current.params = params;
 
-  const createResult = useCallback(
-    (value: ReadResult<T>): UseReadReturnType<ReadResult<T>> => [
-      value,
-      persistedValues.current.error,
-    ],
-    [persistedValues],
-  );
+  if (!Store.getDB()) return createResult(null);
 
   if (!isParamChange && !isOutsideTrigger) {
-    return createResult(lastResult);
+    return createResult(lastResult, false);
   }
-
-  if (!Store.getDB()) return createResult(null);
 
   read();
 

@@ -3,14 +3,15 @@ import { DBRecord, ReadParams, useRead, useUpdate } from 'indexeddb-hooked';
 type Props = { params?: ReadParams<DBRecord>; storeName?: string };
 
 const FruitsBasket: React.FC<Props> = ({ params, storeName }) => {
-  const [fruits, error] = useRead(storeName || 'fruits', {
+  const [fruits, { error, isLoading }] = useRead(storeName || 'fruits', {
     ...params,
     returnWithKey: true,
   });
 
   if (error) console.log('error:', error);
 
-  if (!fruits) return <div>Loading</div>;
+  if (isLoading) return <div>Loading</div>;
+  if (!fruits) return <div>Null</div>;
   /* Since IDB operations are asynchronous, useRead returns `null`
      (or previous result) at first, then triggers render once the data is obtained.*/
 
