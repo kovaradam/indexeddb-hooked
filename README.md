@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="150" src="logo.svg" />
+</p>
+
 A small, reactive IndexedDB binding for React.
 
 ```bash
