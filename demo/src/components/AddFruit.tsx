@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useUpdate } from 'indexeddb-hooked';
 
 const AddFruit = () => {
-  const [update] = useUpdate<string>();
+  const [update, { result }] = useUpdate<string>();
   const inputEl = useRef<HTMLInputElement | null>(null);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -10,6 +10,7 @@ const AddFruit = () => {
     const value = inputEl.current?.value || '';
     update('fruits', { value });
   };
+  if (result) console.log(`Added fruit with key ${result}`);
 
   return (
     <form onSubmit={onSubmit}>

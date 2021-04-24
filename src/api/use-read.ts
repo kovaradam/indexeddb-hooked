@@ -7,9 +7,9 @@ import {
 } from '../model';
 import { asyncRead } from '../core/read';
 import Store from '../store';
-import { compareStringifiedObjects } from '../utils';
+import { useStateUpdater } from '../utils';
 
-type UseReadReturnType<T> = [T, string?];
+type UseReadReturnType<T> = [T, { error?: string; isLoading: boolean }];
 
 interface UseReadParams<T> extends BaseReadParams<T> {}
 
@@ -17,6 +17,8 @@ type PersistedValues<T> = {
   params?: UseReadParams<T>;
   transactionCount: number;
   error?: string;
+  isLoading: boolean;
+  prevResult: ReadResult<T> | null;
 };
 
 function useRead<T extends DBRecord>(
@@ -44,49 +46,67 @@ function useRead<T extends DBRecord>(
   params?: UseReadParams<T>,
 ): UseReadReturnType<ReadResult<T> | null> {
   const [transactionCount, setTransactionCount] = useState(-1);
-  const [, setError] = useState<string>();
-  const [lastResult, setLastResult] = useState<ReadResult<T> | null>(null);
-  const persistedValues = useRef<PersistedValues<T>>({
+  const forceUpdate = useStateUpdater();
+  const persisted = useRef<PersistedValues<T>>({
     params,
     transactionCount,
     error: undefined,
+    isLoading: true,
+    prevResult: null,
   });
 
   useEffect(() => {
     return Store.subscribe(storeName, setTransactionCount);
   }, [storeName]);
 
-  const onSuccess = useCallback(
-    (result: ReadResult<T>, _: Event) => {
-      const compare =
-        typeof result === 'object'
-          ? compareStringifiedObjects
-          : (a: unknown, b: unknown): boolean => a === b;
-      if (
-        !compare(result as Record<string, unknown>, lastResult as Record<string, unknown>)
-      ) {
-        setLastResult(result);
-      }
-    },
-    [lastResult],
-  );
-
   const setErrorMessage = useCallback(
     (value?: string): void => {
-      persistedValues.current.error = value;
-      setError(value);
+      persisted.current.error = value;
     },
-    [persistedValues, setError],
+    [persisted],
+  );
+
+  const setIsLoading = useCallback(
+    (isLoading: boolean): void => {
+      persisted.current.isLoading = isLoading;
+    },
+    [persisted],
+  );
+
+  const setPrevResult = useCallback(
+    (result: ReadResult<T>): void => {
+      persisted.current.prevResult = result;
+    },
+    [persisted],
+  );
+
+  const onSuccess = useCallback(
+    (result: ReadResult<T>, _: Event) => {
+      setIsLoading(false);
+      setPrevResult(result);
+      forceUpdate();
+    },
+    [setPrevResult, setIsLoading, forceUpdate],
+  );
+
+  const onError = useCallback(
+    (event: Event) => {
+      setErrorMessage(String(event));
+      setIsLoading(false);
+      forceUpdate();
+    },
+    [setErrorMessage, setIsLoading, forceUpdate],
   );
 
   const read = useCallback(() => {
-    persistedValues.current.error = undefined;
+    setErrorMessage();
+    setIsLoading(true);
     asyncRead<T>(storeName, {
       ...params,
       onSuccess,
-      onError: (event: Event) => setErrorMessage(String(event)),
+      onError,
     });
-  }, [params, onSuccess, storeName, setErrorMessage]);
+  }, [params, onSuccess, storeName, setErrorMessage, onError, setIsLoading]);
 
   useEffect(() => {
     // read on mount
@@ -96,31 +116,31 @@ function useRead<T extends DBRecord>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const isParamChange = !areParamsEqual(persistedValues.current.params, params);
-  const isOutsideTrigger = transactionCount !== persistedValues.current.transactionCount;
-  persistedValues.current.transactionCount = transactionCount;
-  persistedValues.current.params = params;
-
   const createResult = useCallback(
-    (value: ReadResult<T>): UseReadReturnType<typeof value> => [
-      value,
-      persistedValues.current.error,
+    (value?: ReadResult<T>): UseReadReturnType<ReadResult<T>> => [
+      value !== undefined ? value : persisted.current.prevResult,
+      {
+        error: persisted.current.error,
+        isLoading: persisted.current.isLoading,
+      },
     ],
-    [persistedValues],
+    [persisted],
   );
+
+  const isParamChange = !areParamsEqual(persisted.current.params, params);
+  const isOutsideTrigger = transactionCount !== persisted.current.transactionCount;
+  persisted.current.transactionCount = transactionCount;
+  persisted.current.params = params;
 
   if (!Store.getDB()) return createResult(null);
 
   if (!isParamChange && !isOutsideTrigger) {
-    return createResult(lastResult);
+    return createResult();
   }
 
   read();
 
-  if (Store._isDevelopment) {
-    return createResult(null);
-  }
-  return createResult(lastResult);
+  return createResult();
 }
 
 export default useRead;
