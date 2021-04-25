@@ -172,65 +172,7 @@
        d="m 10.832069,196.61659 a 89.551345,64.266267 0 0 1 89.551351,-64.26627 89.551345,64.266267 0 0 1 89.55134,64.26627 89.551345,64.266267 0 0 1 -89.55134,64.26627 89.551345,64.266267 0 0 1 -89.551351,-64.26627 z"
        id="path1971-87" />
   </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Vrstva 2"
-     style="display:none"
-     transform="translate(0,-97)">
-    <g
-       id="g1968"
-       transform="matrix(0.84927742,0,0,0.84927742,14.767537,14.782919)">
-      <ellipse
-         transform="matrix(0.00231487,-0.99999731,0.99997329,0.00730752,0,0)"
-         ry="100.16615"
-         rx="79.756805"
-         cy="105.26058"
-         cx="-111.35488"
-         id="path1548-7-9-9"
-         style="display:inline;opacity:1;fill:none;fill-opacity:1;stroke:#ff5b5b;stroke-width:0.29356119;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
-      <ellipse
-         transform="matrix(-0.99999731,-0.00231489,0.00730753,-0.99997329,0,0)"
-         ry="100.16616"
-         rx="79.756805"
-         cy="-111.88182"
-         cx="-105.81786"
-         id="path1548-7-9-9-6-4-5"
-         style="display:inline;opacity:1;fill:none;fill-opacity:1;stroke:#ff5b5b;stroke-width:0.29356119;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
-      <ellipse
-         transform="matrix(-0.49799391,-0.86718053,0.86965605,-0.49365815,0,0)"
-         ry="100.16615"
-         rx="79.756805"
-         cy="35.21743"
-         cx="-149.34509"
-         id="path1548-7-9-9-6"
-         style="display:inline;opacity:1;fill:none;fill-opacity:1;stroke:#ff5b5b;stroke-width:0.29356119;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
-      <ellipse
-         transform="matrix(-0.86486563,-0.5020034,0.50631516,-0.86234852,0,0)"
-         ry="100.16615"
-         rx="79.756805"
-         cy="-44.262203"
-         cx="-147.31841"
-         id="path1548-7-9-9-6-4"
-         style="display:inline;opacity:1;fill:none;fill-opacity:1;stroke:#ff5b5b;stroke-width:0.29356119;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
-      <ellipse
-         transform="matrix(-0.86718053,0.49799391,-0.49365813,-0.86965605,0,0)"
-         ry="100.16615"
-         rx="79.756805"
-         cy="-149.5228"
-         cx="-35.963509"
-         id="path1548-7-9-9-6-4-5-7"
-         style="display:inline;opacity:1;fill:none;fill-opacity:1;stroke:#ff5b5b;stroke-width:0.29356119;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
-      <ellipse
-         transform="matrix(-0.5020034,0.86486563,-0.86234852,-0.50631516,0,0)"
-         ry="100.16615"
-         rx="79.756805"
-         cy="-147.09924"
-         cx="43.527229"
-         id="path1548-7-9-9-6-4-5-7-9"
-         style="display:inline;opacity:1;fill:none;fill-opacity:1;stroke:#ff5b5b;stroke-width:0.29356119;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
-    </g>
-  </g>
+  
   <g
      inkscape:label="Vrstva 1"
      inkscape:groupmode="layer"
