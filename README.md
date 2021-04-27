@@ -2,6 +2,9 @@
   <img width="300" src="logo.svg" />
 </p>
 
+[![npm](https://img.shields.io/npm/v/indexeddb-hooked)](https://www.npmjs.com/package/indexeddb-hooked)
+[![Coverage Status](https://coveralls.io/repos/github/kovaradam/indexeddb-hooked/badge.svg?branch=main)](https://coveralls.io/github/kovaradam/indexeddb-hooked?branch=main)
+
 A small, reactive IndexedDB binding for React.
 
 ```bash
