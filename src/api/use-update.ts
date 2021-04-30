@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { asyncUpdate } from '../core/update';
 import { DBRecord, UpdateData, Updater, UpdateResult } from '../model';
-import { useStateUpdater } from '../utils';
+import { useSafeUpdater } from '../utils';
 
 type UseUpdateReturnType<T extends DBRecord> = [
   Updater<T, void>,
@@ -11,7 +11,7 @@ type UseUpdateReturnType<T extends DBRecord> = [
 function useUpdate<T extends DBRecord>(): UseUpdateReturnType<T> {
   const error = useRef<string>();
   const result = useRef<UpdateResult | UpdateResult[]>();
-  const forceUpdate = useStateUpdater();
+  const forceUpdate = useSafeUpdater();
   const setError = useCallback(
     (value: string | undefined) => {
       error.current = value;

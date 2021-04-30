@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 
 type OutsideResolve<T> = (value: T) => void;
 type OutsideReject<T = string> = (reason: T) => void;
@@ -8,23 +8,20 @@ export function createPromiseWithOutsideResolvers<Value, Reason>(): [
   OutsideResolve<Value>,
   OutsideReject<Reason>,
 ] {
-  let outsideResolve = (_: Value) => {
-    return;
-  };
-  let outsideReject = (_: Reason) => {
-    return;
-  };
-  const promise = new Promise<Value>(function (
-    resolve: typeof outsideResolve,
-    reject: typeof outsideReject,
-  ) {
-    outsideResolve = resolve;
-    outsideReject = reject;
-  });
+  let outsideResolve = (_: Value) => {};
+  let outsideReject = (_: Reason) => {};
+
+  const promise = new Promise<Value>(
+    (resolve: typeof outsideResolve, reject: typeof outsideReject) => {
+      outsideResolve = resolve;
+      outsideReject = reject;
+    },
+  );
+
   return [promise, outsideResolve, outsideReject];
 }
 
-export function useStateUpdater() {
+export function useSafeUpdater(): React.DispatchWithoutAction {
   const isMounted = useRef(true);
 
   const [, forceUpdate] = useReducer((p) => (isMounted.current ? !p : p), false);
@@ -35,5 +32,6 @@ export function useStateUpdater() {
     },
     [isMounted],
   );
+
   return forceUpdate;
 }

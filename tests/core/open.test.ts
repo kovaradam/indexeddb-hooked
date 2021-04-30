@@ -211,27 +211,49 @@ it('creates indices with given params', (done) => {
   });
 });
 
-// it('throws when populating store with primitive data w/o autoIncrement', () => {
-//   expect.assertions(1);
-//   const store = getStore({
-//     data: [1, 2, 3],
-//   });
-//   const config = getConfig({
-//     objectStores: [store],
-//   });
-//   expect(open).toThrowError();
-//   open(config);
-// });
+it('overrides indices with given params', (done) => {
+  const indexNames = ['a', 'a'];
+  const indexKeyPath = 'test';
+  expect.assertions(3);
+  const indexOptions: IDBIndexParameters = {
+    multiEntry: true,
+    unique: true,
+  };
+  const store = getStore({
+    indexes: [
+      { name: indexNames[0], keyPath: indexKeyPath, options: indexOptions },
+      { name: indexNames[1], keyPath: indexKeyPath },
+    ],
+  });
+  const config = getConfig({
+    objectStores: [store],
+  });
 
-// it('throws when populating store with primitive data and keyPath specified', () => {
-//   expect.assertions(1);
-//   const store = getStore({
-//     data: [1, 2, 3],
-//     options: { keyPath: 'testKey' },
-//   });
-//   const config = getConfig({
-//     objectStores: [store],
-//   });
-//   expect(open).toThrowError();
-//   open(config);
-// });
+  open(config).then((result) => {
+    const storeName = config.objectStores[0].name;
+    let index = result.transaction(storeName).objectStore(storeName).index(indexNames[0]);
+    index = result.transaction(storeName).objectStore(storeName).index(indexNames[1]);
+    expect(index.keyPath).toBe(indexKeyPath);
+    expect(index.unique).toBeFalsy();
+    expect(index.multiEntry).toBeFalsy();
+    done();
+  });
+});
+
+it('throws w/o provided params on version change', (done) => {
+  expect.assertions(1);
+  const store = getStore({
+    data: [1, 2, 3],
+  });
+  store.name = undefined;
+  const config = getConfig({
+    objectStores: [store],
+    version: 5,
+  });
+  const rejectionHandle = jest.fn();
+  open(config).catch(() => {
+    rejectionHandle();
+    expect(rejectionHandle).toBeCalled();
+    done();
+  });
+});

@@ -7,7 +7,7 @@ import {
 } from '../model';
 import { asyncRead } from '../core/read';
 import Store from '../store';
-import { useStateUpdater } from '../utils';
+import { useSafeUpdater } from '../utils';
 
 type UseReadReturnType<T> = [T, { error?: string; isLoading: boolean }];
 
@@ -46,7 +46,7 @@ function useRead<T extends DBRecord>(
   params?: UseReadParams<T>,
 ): UseReadReturnType<ReadResult<T> | null> {
   const [transactionCount, setTransactionCount] = useState(-1);
-  const forceUpdate = useStateUpdater();
+  const forceUpdate = useSafeUpdater();
   const persisted = useRef<PersistedValues<T>>({
     params,
     transactionCount,

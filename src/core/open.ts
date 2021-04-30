@@ -55,6 +55,7 @@ const open = (config: Config): Promise<IDBDatabase> => {
     };
   }
   DBOpenRequest.onupgradeneeded = onUpgradeNeeded;
+
   return promise;
 };
 
