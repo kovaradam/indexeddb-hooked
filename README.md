@@ -4,6 +4,7 @@
 
 [![npm](https://img.shields.io/npm/v/indexeddb-hooked)](https://www.npmjs.com/package/indexeddb-hooked)
 [![Coverage Status](https://coveralls.io/repos/github/kovaradam/indexeddb-hooked/badge.svg?branch=main)](https://coveralls.io/github/kovaradam/indexeddb-hooked?branch=main)
+[![Dependencies](https://david-dm.org/kovaradam/indexeddb-hooked.svg)](https://david-dm.org/)
 
 A small, reactive IndexedDB binding for React.
 
