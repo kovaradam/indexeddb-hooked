@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import AddFruit from './components/AddFruit';
 import FruitsBasket from './components/FruitsBasket';
 import Details from './components/Details';
-import Creator from './components/Creator';
-import CreatorJS from './components/CreatorJS';
-import { subscribe, useUpdate } from 'indexeddb-hooked';
+import { open, subscribe, useUpdate } from 'indexeddb-hooked';
+import config from './config';
+
+open(config);
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
       <CreatorJS />
 
     */}
-      <StoreNameInput />
+      {/* <StoreNameInput /> */}
     </div>
   );
 }

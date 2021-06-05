@@ -30,7 +30,7 @@ export function asyncRead<T>(storeName: string, params: AsyncReadParams<T>): voi
     request.onsuccess = (event: Event): void => {
       onSuccess(request.result, event);
     };
-  } else if (params?.key) {
+  } else if (params?.key !== undefined) {
     request = params.index
       ? objectStore.index(params.index).get(params.key)
       : objectStore.get(params.key);
