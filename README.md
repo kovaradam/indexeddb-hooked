@@ -113,7 +113,7 @@ import React from 'react';
 import { useRead } from 'indexeddb-hooked';
 
 const FruitsBasket = () => {
-  const fruits = useRead('fruits',{
+  const [fruits] = useRead('fruits',{
     returnWithKey: true,
     keyRange: IDBKeyRange.bound(0, 2),
     direction:'prev'
