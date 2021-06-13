@@ -86,7 +86,7 @@ function put<T extends DBRecord>(
     return request;
   }
 
-  if (!key) {
+  if (key === undefined) {
     return _put(value);
   }
   if (replace) {
